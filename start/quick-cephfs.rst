@@ -99,6 +99,6 @@ Ceph 存储集群默认要求认证，需指定相应的密钥环文件，除非
 
 .. _存储集群快速入门: ../quick-ceph-deploy
 .. _Ceph FS: ../../cephfs/
-.. _FAQ: http://wiki.ceph.com/03FAQs/01General_FAQ#How_Can_I_Give_Ceph_a_Try.3F
+.. _FAQ: http://tracker.ceph.com/projects/ceph/wiki/How_Can_I_Give_Ceph_a_Try
 .. _故障排除: ../../cephfs/troubleshooting
 .. _操作系统推荐: ../os-recommendations
