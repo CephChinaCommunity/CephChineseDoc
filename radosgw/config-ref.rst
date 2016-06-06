@@ -3,13 +3,13 @@
 =======================
 
 下列的选项可加入 Ceph 配置文件（一般是 ``ceph.conf`` ）的 \
-``[client.radosgw.{instance-name}]`` 段下，很多选项都有默认值，你若未指定，自\
-然用默认。
+``[client.radosgw.{instance-name}]`` 段下，这些选项可能 \
+有默认值.如果你没有指定，自就会自动使用默认值。
 
 
 ``rgw data``
 
-:描述: 设置 Ceph 对象网关的数据文件位置。
+:描述: 设置 Ceph 对象网关存储数据文件位置。
 :类型: String
 :默认值: ``/var/lib/ceph/radosgw/$cluster-$id``
 
@@ -38,8 +38,8 @@
 ``rgw socket path``
 
 :描述: 域套接字的路径， ``FastCgiExternalServer`` 要使用此套接字。若未指定， \
-       Ceph 对象网关就不会以外部服务器运行。这里的路径必须与 ``rgw.conf`` 里\
-       的路径相同。
+       Ceph 对象网关就不会以外部服务器的方式运行。这里的路径必须与 ``rgw.conf`` \
+       里的路径相同。
 
 :类型: String
 :默认值: N/A
@@ -47,14 +47,14 @@
 
 ``rgw host``
 
-:描述: Ceph 对象网关例程所在主机，可以是 IP 地址或者主机名。
+:描述: Ceph 对象网关实例所在主机，可以是 IP 地址或者主机名。
 :类型: String
 :默认值: ``0.0.0.0``
 
 
 ``rgw port``
 
-:描述: 例程接受请求的端口。若未指定， Ceph 对象网关将运行外部 FastCGI 。
+:描述: 对象网关实例接受请求的端口。若未指定， Ceph 对象网关将运行外部 FastCGI 。
 :类型: String
 :默认值: None
 
@@ -68,14 +68,14 @@
 
 ``rgw script uri``
 
-:描述: 如果请求中没带 ``SCRIPT_URI`` 变量，这里的设置可作为补救。
+:描述: 如果请求中没带 ``SCRIPT_URI`` 变量，这里的设置将作为默认值使用.
 :类型: String
 :默认值: None
 
 
 ``rgw request uri``
 
-:描述: 如果请求中没带 ``REQUEST_URI`` 变量，这里的设置可作为补救。
+:描述: 如果请求中没带 ``REQUEST_URI`` 变量，这里的设置将作为默认值使用。
 :类型: String
 :默认值: None
 
@@ -98,14 +98,14 @@
 
 ``rgw op thread timeout``
 
-:描述: 在运行线程的超时值。
+:描述: 运行中线程的超时值。
 :类型: Integer
 :默认值: 600
 
 
 ``rgw op thread suicide timeout``
 
-:描述: Ceph 对象网关进程的自杀超时值（ ``timeout`` ）。设置为 \
+:描述: Ceph 对象网关进程的超时自杀值（ ``timeout`` ）。设置为 \
        ``0`` 时禁用。
 
 :类型: Integer
@@ -132,7 +132,7 @@
 
 ``rgw num control oids``
 
-:描述: 不同的 ``rgw`` 例程间用于缓存同步的通知对象数量。
+:描述: 不同的 ``rgw`` 实例间用于缓存同步的通知对象数量。
 :类型: Integer
 :默认值: ``8``
 
@@ -313,16 +313,16 @@ region （域组）
 ===============
 
 Ceph 从 v0.67 版开始，通过 region 概念支持 Ceph 对象网关联盟部署和统一的命\
-名空间。 region 定义了位于一或多个域内的 Ceph 对象网关例程的地理位置。
+名空间。 region 定义了位于一或多个域内的 Ceph 对象网关实例的地理位置。
 
 region 的配置不同于一般配置过程，因为不是所有的配置都放在 Ceph 配置文件中。\
-从 Ceph 0.67 版开始，你可以列举 region 、获取 region 配置或设置 region 配置。
+从 Ceph 0.67 版开始，你可以列出所有 region 、获取 region 配置以及设置 region 配置。
 
 
-罗列 region
------------
+列出所有 region
+---------------
 
-Ceph 集群可包含一系列 region ，可用下列命令列举 region ： ::
+Ceph 集群可包含一系列 region ，可用下列命令列出所有 region ::
 
 	sudo radosgw-admin regions list
 
@@ -343,7 +343,7 @@ Ceph 集群可包含一系列 region ，可用下列命令列举 region ： ::
 	sudo radosgw-admin region-map get
 
 
-.. note:: 如果你的到了 ``failed to read region map`` 错误，先试试 \
+.. note:: 如果你得到了 ``failed to read region map`` 错误，先试试 \
    ``sudo radosgw-admin region-map update`` 。
 
 
@@ -376,10 +376,10 @@ Ceph 集群可包含一系列 region ，可用下列命令列举 region ： ::
     "default_placement": "default-placement"}
 
 
-设置一 region
--------------
+设置一个 region
+---------------
 
-定义 region 需创建一个 JSON 对象、并提供必需的选项：
+定义 region 需创建一个 JSON 对象、并提供必需的参数：
 
 #. ``name``: region 名字，必需。
 
@@ -388,8 +388,8 @@ Ceph 集群可包含一系列 region ，可用下列命令列举 region ： ::
 #. ``is_master``: 决定着此 region 是否为主 region ，必需。\ **注：**\ 只能\
    有一个主 region 。
 
-#. ``endpoints``: region 内的所有终结点列表。例如，你可以用多个域名指向同\
-   一 region 区，记得在斜杠前加反斜杠进行转义（ ``\/`` ）。也可以给终结点\
+#. ``endpoints``: region 内的所有结点列表。例如，你可以用多个域名指向同\
+   一 region 区，记得在斜杠前加反斜杠进行转义（ ``\/`` ）。也可以给结点\
    指定端口号（ ``fqdn:port`` ），可选。
 
 #. ``hostnames``: region 内所有主机名的列表。例如，这样你就可以在同一 \
@@ -399,7 +399,7 @@ Ceph 集群可包含一系列 region ，可用下列命令列举 region ： ::
 #. ``master_zone``: region 的主域，可选。若未指定，则选择默认域。\
    **注：**\ 每个 region 只能有一个主域。
 
-#. ``zones``: region 内所有域的列表。各个域都有名字（必需的）、一系列终结\
+#. ``zones``: region 内所有域的列表。各个域都有名字（必需的）、一系列结\
    点（可选的）、以及网关是否要记录元数据和数据操作（默认不记录）。
 
 #. ``placement_targets``: 放置目标列表（可选）。每个放置目标都包含此放置目标\
@@ -410,7 +410,7 @@ Ceph 集群可包含一系列 region ，可用下列命令列举 region ： ::
    ``default-placement`` 。你可以在用户信息里给各用户设置一个用户级的默认放置\
    目标。
 
-要配置起一个 region ，需创建一个包含必需字段的 JSON 对象，把它存入文件（如 \
+要配置一个 region ，需创建一个包含必需字段的 JSON 对象，把它存入文件（如 \
 ``region.json`` ），然后执行下列命令： ::
 
 	sudo radosgw-admin region set --infile region.json
@@ -424,21 +424,21 @@ Ceph 集群可包含一系列 region ，可用下列命令列举 region ： ::
    ``default`` region 。
 
 
-最后，更新 region 图。 ::
+最后，更新 region map。 ::
 
 	sudo radosgw-admin region-map update
 
 
-配置 region 图
+配置 region map
 --------------
 
-配置 region 图的过程包括创建含一或多个 region 的 JSON 对象，还有设置集群的\
-主 region ``master_region`` 。 region 图内的各 region 都由键/值对组成，其\
+配置 region map的过程包括创建含一或多个 region 的 JSON 对象，还有设置集群的\
+主 region ``master_region`` 。 region map内的各 region 都由键/值对组成，其\
 中 ``key`` 选项等价于单独配置 region 时的 ``name`` 选项， ``val`` 是包含单\
 个 region 完整配置的 JSON 对象。
 
 你可以只有一个 region ，其 ``is_master`` 设置为 ``true`` ，而且必须在 \
-region 图末尾设置为 ``master_region`` 。下面的 JSON 对象是默认 region 图的\
+region map末尾设置为 ``master_region`` 。下面的 JSON 对象是默认 region map的\
 实例。
 
 
@@ -467,42 +467,42 @@ region 图末尾设置为 ``master_region`` 。下面的 JSON 对象是默认 re
         "master_region": "default"
      }
 
-要配置一个 region 图，执行此命令： ::
+要配置一个 region map，执行此命令： ::
 
 	sudo radosgw-admin region-map set --infile regionmap.json
 
-其中 ``regionmap.json`` 是创建的 JSON 文件。确保你创建了 region 图里所指\
-的那些域。最后，更新此图。 ::
+其中 ``regionmap.json`` 是创建的 JSON 文件。确保你创建了 region map里所指\
+的那些域。最后，更新此map。 ::
 
 	sudo radosgw-admin regionmap update
 
 
-域
-==
+Zones
+====================
 
-从 Ceph v0.67 版起， Ceph 对象网关支持域概念，它是一或多个 Ceph 对象网关例程\
+从 Ceph v0.67 版起， Ceph 对象网关支持zone概念，它是一或多个 Ceph 对象网关实例\
 组成的逻辑组。
 
-域的配置不同于典型配置过程，因为并非所有配置都位于 Ceph 配置文件内。从 0.67 \
-版起，你可以列举域、获取域配置、设置域配置。
+zone的配置不同于典型配置过程，因为并非所有配置都位于 Ceph 配置文件内。从 0.67 \
+版起，你可以列出所有zone、获取zone配置、设置zone配置。
 
 
-列举域
+列出所有zone
 ------
 
-要列举某集群内的域，执行： ::
+要列出某集群内的所有zone，执行： ::
 
 	sudo radosgw-admin zone list
 
 
-获取单个域
+获取单个zone
 ----------
 
-要获取某一域的配置，执行： ::
+要获取某一zone的配置，执行： ::
 
 	sudo radosgw-admin zone get [--rgw-zone=<zone>]
 
-``default`` 这个默认域的配置大致如此：
+``default`` 这个默认zone的配置大致如此：
 
 .. code-block:: javascript
 
@@ -526,24 +526,24 @@ region 图末尾设置为 ``master_region`` 。下面的 JSON 对象是默认 re
      }
 
 
-配置域
+配置zone
 ------
 
-配置域时需指定一系列的 Ceph 对象网关存储池。为保持一致性，我们建议用区域名\
+配置zone时需指定一系列的 Ceph 对象网关存储池。为保持一致性，我们建议用region名\
 作为存储池名字的前缀。存储池配置见\ `存储池`_\ 。
 
-要配置起一个域，需创建包含存储池的 JSON 对象、并存入文件（如 \
-``zone.json`` ）；然后执行下列命令，把 ``{zone-name}`` 替换为域名称： ::
+要配置起一个zone，需创建包含存储池的 JSON 对象、并存入文件（如 \
+``zone.json`` ）；然后执行下列命令，把 ``{zone-name}`` 替换为zone名称： ::
 
 	sudo radosgw-admin zone set --rgw-zone={zone-name} --infile zone.json
 
 其中， ``zone.json`` 是你创建的 JSON 文件。
 
 
-region 和域选项
-===============
+region 和 zone 选项
+====================
 
-你可以在 Ceph 配置文件中的各例程 ``[client.radosgw.{instance-name}]`` 段下设\
+你可以在 Ceph 配置文件中的各实例 ``[client.radosgw.{instance-name}]`` 段下设\
 置下列选项。
 
 
@@ -551,7 +551,7 @@ region 和域选项
 
 ``rgw zone``
 
-:描述: 网关例程所在的域名称。
+:描述: 网关例程所在的zone名称。
 :类型: String
 :默认值: None
 
@@ -577,17 +577,17 @@ region 和域选项
 存储池
 ======
 
-Ceph 域会映射到一系列 Ceph 存储集群的存储池。
+Ceph zone会映射一系列 Ceph 存储集群的存储池。
 
 .. topic:: 手动创建存储池与自动生成的存储池对比
 
-   如果你给 Ceph 对象网关的用户密钥分配了写权限，此网关就有能力自动创建存储\
-   池。这样虽便捷，但 Ceph 对象存储集群的归置组数量会是默认值（此值也许不太\
+   如果你给 Ceph 对象网关的用户 key 分配了写权限，此网关就有能力自动创建存储\
+   池。这样虽然便捷，但 Ceph 对象存储集群的 PG 数会是默认值（此值也许不太\
    理想）或者 Ceph 配置文件中的自定义配置。如果你想让 Ceph 对象网关自动创建\
-   存储池，确保归置组数量的默认值要合理。详情见\ `存储池配置`_\ ，关于创建存\
+   存储池，确保 PG 数的默认值要合理。详情见\ `存储池配置`_\ ，关于创建存\
    储池见\ `集群存储池`_\ 。
 
-Ceph 对象网关的默认域的默认存储池有：
+Ceph 对象网关的默认 zone 的默认存储池有：
 
 - ``.rgw``
 - ``.rgw.control``
@@ -600,10 +600,10 @@ Ceph 对象网关的默认域的默认存储池有：
 - ``.users.swift``
 - ``.users.uid``
 
-你应该能够清晰地判断某个域会怎样访问各存储池。你可以为每个域创建一系列存储\
-池，或者让多个域共用同一系列的存储池。作为最佳实践，我们建议分别位于各 \
-region 中的主域和二级域都要有各自的存储池系列。为某个域创建存储池时，建议\
-默认存储池名以 region 名和域名作为前缀，例如：
+你应该能够清晰地判断某个 zone 会怎样访问各存储池。你可以为每个 zone 创建一系列\
+存储池，或者让多个 zone 共用同一系列的存储池。作为最佳实践，我们建议分别位于各 \
+region 中的主 zone 和第二 zone 都要有各自的一系列存储池。为某个域创建存储池时，建议\
+默认存储池名以 region 名和 zone 名作为前缀，例如：
 
 - ``.region1-zone1.domain.rgw``
 - ``.region1-zone1.rgw.control``
@@ -616,17 +616,17 @@ region 中的主域和二级域都要有各自的存储池系列。为某个域�
 - ``.region1-zone1.users.swift``
 - ``.region1-zone1.users.uid``
 
-Ceph 对象网关会把桶索引（ ``index_pool`` ）和桶数据（ ``data_pool`` ）存储到\
-归置存储池，这些可以重叠——也就是你可以把索引和数据存入同一存储池。索引存储池\
+Ceph 对象网关会把 bucket 索引（ ``index_pool`` ）和 bucket 数据（ ``data_pool`` ）\
+存储到归置存储池，这些可以重叠——也就是你可以把索引和数据存入同一存储池。索引存储池\
 的默认归置地是 ``.rgw.buckets.index`` ，数据存储池的默认归置地是 \
-``.rgw.buckets`` ，给域指定存储池的方法见\ `域`_\ 。
+``.rgw.buckets`` ，给 zone 指定存储池的方法见\ `Zones`_\ 。
 
 
 .. deprecated:: v.67
 
 ``rgw cluster root pool``
 
-:描述: 为此例程存储 ``radosgw`` 元数据的存储池。从 v0.67 之后不再支持，可改\
+:描述: 为此实例存储 ``radosgw`` 元数据的存储池。从 v0.67 之后不再支持，可改\
        用 ``rgw zone root pool`` 。
 
 :类型: String
@@ -649,7 +649,7 @@ Ceph 对象网关会把桶索引（ ``index_pool`` ）和桶数据（ ``data_poo
 
 ``rgw zone root pool``
 
-:描述: 用于存储此域所有相关信息的存储池。
+:描述: 用于存储此 zone 所有相关信息的存储池。
 :类型: String
 :默认值: ``.rgw.root``
 
@@ -706,7 +706,7 @@ Swift 选项
 
 ``rgw log nonexistent bucket``
 
-:描述: 让 Ceph 对象网关记录访问不存在的桶的请求。
+:描述: 让 Ceph 对象网关记录访问不存在的 bucket 的请求。
 :类型: Boolean
 :默认值: ``false``
 
@@ -727,14 +727,14 @@ Swift 选项
 
 ``rgw usage max shards``
 
-:描述: 使用率日志的最大数量。
+:描述: 使用率日志的最大可分片数量。
 :类型: Integer
 :默认值: ``32``
 
 
 ``rgw usage max user shards``
 
-:描述: 单个用户使用率日志的最大数量。
+:描述: 单个用户使用率日志的最大可分片数量。
 :类型: Integer
 :默认值: ``1``
 
@@ -818,7 +818,7 @@ Swift 选项
 
 ``rgw data log num shards``
 
-:描述: 用于保存数据变更日志的碎片（对象）数量。
+:描述: 用于保存数据变更日志的分片（对象）数量。
 :类型: Integer
 :默认值: ``128``
 
@@ -839,7 +839,7 @@ Swift 选项
 
 ``rgw md log max shards``
 
-:描述: 用于元数据日志的最大碎片数。
+:描述: 用于元数据日志的最大分片数。
 :类型: Integer
 :默认值: ``64``
 
@@ -882,6 +882,13 @@ Keystone 选项
 :描述: 令牌有效期查验的周期，秒。
 :类型: Integer
 :默认值: ``15 * 60``
+
+
+``rgw keystone verify ssl``
+
+:描述: 将 token 请求发送给 keystone 时验证 SSL 证书.
+:类型: Boolean
+:默认值: ``true``
 
 
 .. _体系结构: ../../architecture#data-striping

@@ -1,93 +1,65 @@
 =====================
- Ceph 对象网关的配置
+配置 Ceph 对象网关
 =====================
 
-要配置 Ceph 对象网关需要一个运行着的 Ceph 存储集群，还有启用了 FastCGI 模块\
-的 Apache 网页服务器。
+要配置一个 Ceph 对象网关需要一个运行着的 Ceph 存储集群，以及启用了 FastCGI 模块\
+的 Apache web服务器。
 
 Ceph 对象网关是 Ceph 存储集群的一个客户端，作为 Ceph 存储集群的客户端，它需要：
 
-- A name for the gateway instance. We use ``gateway`` in this guide.
-- A storage cluster user name with appropriate permissions in a keyring.
-- Pools to store its data.
-- A data directory for the gateway instance.
-- An instance entry in the Ceph Configuration file.
-- A configuration file for the web server to interact with FastCGI.
+- 需要为网关实例配置一个名字，在本手册中我们使用 ``gateway`` .
+- 存储集群的一个用户名，并且该用户在keyring中有合适的权限.
+- 存储数据的资源池.
+- 网关实例的一个数据目录.
+- Ceph 配置文件中有一个实例配置入口.
+- web 服务器有一个配置文件跟 FastCGI 交互.
 
 
-Create a User and Keyring
+新建用户和 Keyring
 =========================
 
-Each instance must have a user name and key to communicate with a Ceph Storage
-Cluster. In the following steps, we use an admin node to create a keyring. 
-Then, we create a client user name and key. Next, we add the 
-key to the Ceph Storage Cluster. Finally, we distribute the key ring to 
-the node containing the gateway instance.
+每一个实例必须有一个用户名和key来跟 Ceph 存储集群通信.在下面的步骤中,我们使用管理\
+节点来新建keyring.然后,我们新建一个客户端用户名和key.然后我们将这个key添加到 Ceph \
+存储集群中.最后,分发这个 key ring到包含这个网关实例的节点.
+
 
 .. topic:: Monitor Key CAPS
 
-   When you provide CAPS to the key, you MUST provide read capability.
-   However, you have the option of providing write capability for the monitor. 
-   This is an important choice. If you provide write capability to the key, 
-   the Ceph Object Gateway will have the ability to create pools automatically; 
-   however, it will create pools with either the default number of placement 
-   groups (not ideal) or the number of placement groups you specified in your 
-   Ceph configuration file. If you allow the Ceph Object Gateway to create 
-   pools automatically, ensure that you have reasonable defaults for the number
-   of placement groups first. See `Pool Configuration`_ for details.
+   当你给 key 分配 CAPS 的时候,你必须提供读权限.然而,你也可以选择为 monitor 提供\
+   写的权限. 这是一个重要的抉择.如果你给 key 分配了写权限, Ceph 对象网关将具备自动\
+   新建资源池的能力; 此时,它将会根据默认的 PG 值(不是最合适的)或者你在 Ceph 配置文\
+   件中指定的 PG 数. 如果你允许 Ceph 对象网关自动新建资源池，请确保你首先定义好了合\
+   理的默认 PG 值. 查看 `资源池配置`_ 获取详细信息.
 
 
 关于 Ceph 认证请参考\ `用户管理`_\ 。
 
-#. 给这个网关创建一个密钥环： ::
+#. 为每一个实例生成一个 Ceph 对象网关用户名和key. 举一个典型实例, 我们将使用 ``client.radosgw`` \
+   后使用 ``gateway`` 作为用户名:: 
 
-	sudo ceph-authtool --create-keyring /etc/ceph/ceph.client.radosgw.keyring
-	sudo chmod +r /etc/ceph/ceph.client.radosgw.keyring
+        sudo ceph auth get-or-create client.radosgw.gateway osd 'allow rwx' mon 'allow rwx' -o /etc/ceph/ceph.client.radosgw.keyring
 
-
-#. Generate a Ceph Object Gateway user name and key for each instance. For
-   exemplary purposes, we will use the name ``gateway`` after ``client.radosgw``:: 
-
-	sudo ceph-authtool /etc/ceph/ceph.client.radosgw.keyring -n client.radosgw.gateway --gen-key
-
-
-#. Add capabilities to the key. See `配置参考——存储池`_ for details
-   on the effect of write permissions for the monitor and creating pools. ::
-
-	sudo ceph-authtool -n client.radosgw.gateway --cap osd 'allow rwx' --cap mon 'allow rwx' /etc/ceph/ceph.client.radosgw.keyring
-
-
-#. Once you have created a keyring and key to enable the Ceph Object Gateway 
-   with access to the Ceph Storage Cluster, add the key to your 
-   Ceph Storage Cluster. For example::
-
-	sudo ceph -k /etc/ceph/ceph.client.admin.keyring auth add client.radosgw.gateway -i /etc/ceph/ceph.client.radosgw.keyring
-
-
-#. Distribute the keyring to the node with the gateway instance. ::
+#. 分发生成的keyring到网关实例所在节点. ::
 
 	sudo scp /etc/ceph/ceph.client.radosgw.keyring  ceph@{hostname}:/home/ceph
 	ssh {hostname}
 	sudo mv ceph.client.radosgw.keyring /etc/ceph/ceph.client.radosgw.keyring
 
-   .. note:: 如果 ``admin node`` 就是 ``gateway host`` ，那第 5 步就没必要。
+   .. note:: 如果 ``admin node`` 就是 ``gateway host`` ，那第 2 步就没必要。
+
 
 
 创建存储池
 ==========
 
-Ceph Object Gateways require Ceph Storage Cluster pools to store specific
-gateway data.  If the user you created has permissions, the gateway
-will create the pools automatically. However, you should ensure that you have
-set an appropriate default number of placement groups per pool into your Ceph
-configuration file.
+Ceph 对象网关需要 Ceph 存储集群资源池来存储特定的网关数据. 如果你新建的用户有权限, 网关\
+将会自动新建所需资源池. 然而,你需要确保在你的 Ceph 配置文件中给资源池设置了合理的默认 PG 值.
 
 .. note:: Ceph 对象网关有多个存储池，考虑到所有存储池会共用相同的 CRUSH 分级\
    结构，所以 PG 数不要设置得过大，否则会影响性能。
 
-When configuring a gateway with the default region and zone, the naming
-convention for pools typically omits region and zone naming, but you can use any
-naming convention you prefer. For example:
+当使用默认的 region 和 zone 时,资源池的命名规则通常省略了 region 和 zone 的名字，但是\
+你可以使用任何你想要的命名规则. 举例如下:
 
 
 - ``.rgw``
@@ -106,19 +78,18 @@ naming convention you prefer. For example:
 - ``.users.uid``
 
 
-See `配置参考——存储池`_ for details on the default pools for
-gateways. See `Pools`_ for details on creating pools. As already said, if
-write permission is given, Ceph Object Gateway will create pools automatically.
-To create a pool manually, execute the following::
+查看 `配置参考——存储池`_ 获取关于网关默认资源池的详细信息. 查看 `资源池`_ 获取新建资源池的详\
+细信息. 正如前面所说，如果具备写权限,Ceph 对象网关将会自动新建资源池.
+如果想手动新建资源池,执行下面的命令::
 
 	ceph osd pool create {poolname} {pg-num} {pgp-num} {replicated | erasure} [{erasure-code-profile}]  {ruleset-name} {ruleset-number}
 
 .. tip:: Ceph 允许多级 CRUSH 和多种 CRUSH 规则集，这样在配置你自己的网关时就\
-   有很大的灵活性。像 ``rgw.buckets.index`` 这样的存储池就可以利用副本数适当\
-   的 SSD 存储池取得高性能；后端存储也可以从更经济的纠删编码的存储中获益，还\
-   可能利用缓存层提升性能。
+   有很大的灵活性。像 ``rgw.buckets.index`` 这样的存储池就可以利用 SSD 来做存\
+   储池以获取高性能；后端存储也可以从更经济的纠删编码的存储中获益，还可利用缓存层\
+   提升性能。
 
-完成此步骤之后，执行下列命令确认前述存储池是否都创建了： ::
+完成上述步骤之后，执行下列的命令确认前述存储池都已经创建了： ::
 
 	rados lspools
 
@@ -126,15 +97,13 @@ To create a pool manually, execute the following::
 为 Ceph 新增网关配置
 ====================
 
-Add the Ceph Object Gateway configuration to your Ceph Configuration file in
-``admin node``. The Ceph Object Gateway configuration requires you to
-identify the Ceph Object Gateway instance. Then, you must specify the host name
-where you installed the Ceph Object Gateway daemon, a keyring (for use with
-cephx), the socket path for FastCGI and a log file.
+添加 Ceph 对象网关配置到 ``admin node`` 节点的 Ceph 配置文件中. Ceph 对象网关配\
+置需要你指定 Ceph 对象网关实例. 然后你必须指定你安装有 Ceph 对象网关守护进程的节点\
+的主机名, 一个 keyring (为了使用 cephx), FastCGI 的 socket 路径和日志文件.
 
-For distros with Apache 2.2 and early versions of Apache 2.4 (RHEL 6, Ubuntu
-12.04, 14.04 etc), append the following configuration to ``/etc/ceph/ceph.conf``
-in your ``admin node``::
+
+对于使用 Apache 2.2 和 Apache 2.4 早期版本 (RHEL 6, Ubuntu
+12.04, 14.04 etc) 的发行版, 追加下面的配置到 ``admin node`` 的文件 ``/etc/ceph/ceph.conf`` 中::
 
 	[client.radosgw.gateway]
 	host = {hostname}
@@ -145,11 +114,11 @@ in your ``admin node``::
 	rgw print continue = false
 
 
-.. note:: Apache 2.2 and early versions of Apache 2.4 do not use Unix Domain
-   Sockets but use localhost TCP.
+.. note:: Apache 2.2 和早期 Apache 2.4 版本不使用 Unix Domain
+   Sockets 而是用 localhost TCP.
 
-For distros with Apache 2.4.9 or later (RHEL 7, CentOS 7 etc), append the
-following configuration to ``/etc/ceph/ceph.conf`` in your ``admin node``::
+对于使用 Apache 2.4.9 或者更新版版本的发行版 (RHEL 7, CentOS 7 等), 追加下面的配置\
+到 ``admin node`` 的文件 ``/etc/ceph/ceph.conf`` 中::
 
 	[client.radosgw.gateway]
 	host = {hostname}
@@ -159,28 +128,22 @@ following configuration to ``/etc/ceph/ceph.conf`` in your ``admin node``::
 	rgw print continue = false
 
 
-.. note:: ``Apache 2.4.9`` supports Unix Domain Socket (UDS) but as
-   ``Ubuntu 14.04`` ships with ``Apache 2.4.7`` it doesn't have UDS support and
-   has to be configured for use with localhost TCP. A bug has been filed for
-   backporting UDS support in ``Apache 2.4.7`` for ``Ubuntu 14.04``.
-   See: `Backport support for UDS in Ubuntu Trusty`_
+.. note:: ``Apache 2.4.9`` 支持 Unix Domain Socket (UDS) ，但是 ``Ubuntu 14.04`` \
+   附带的 ``Apache 2.4.7`` 不支持 UDS ,并且默认配置使用 localhost TCP. 在``Ubuntu 14.04`` \
+   中的 ``Apache 2.4.7`` 已经发现一个 bug ，并且已经申请一个补丁以支持 UDS.
+   查看: `Ubuntu Trusty 中支持 UDS 的补丁`_
 
-Here, ``{hostname}`` is the short hostname (output of command ``hostname -s``)
-of the node that is going to provide the gateway service i.e, the
-``gateway host``.
-
-The ``[client.radosgw.gateway]`` portion of the gateway instance identifies this
-portion of the Ceph configuration file as configuring a Ceph Storage Cluster
-client where the client type is a Ceph Object Gateway (i.e., ``radosgw``).
+这里, ``{hostname}`` 是即将提供网关服务的节点的主机名 ( ``hostname -s`` 命令的输出), \
+比如 ``gateway host``. 网关实例的 ``[client.radosgw.gateway]`` 部分标识了 Ceph 配置\
+文件的这个部分是用来配置 Ceph 存储集群的一个客户端的，这个客户端的类型是 Ceph 对象网关 \
+(比如, ``radosgw``).
 
 
-.. note:: The last line in the configuration i.e, ``rgw print continue = false``
-   is added to avoid issues with ``PUT`` operations.
+.. note:: 配置文件的最后一行 ``rgw print continue = false`` 是用来避免 ``PUT`` 操\
+   作可能出现的问题.
 
-Once you finish the setup procedure, if you encounter issues with your
-configuration, you can add debugging to the ``[global]`` section of your Ceph
-configuration file and restart the gateway to help troubleshoot any
-configuration issues. For example::
+一旦你完成了这些安装过程, 如果你所做的配置遇到了问题, 你可以在 Ceph 配置文件的 ``[global]`` \
+部分添加调试选项, 然后重启你的网关来帮忙排错,找到可能的配置问题. 举例如下::
 
 	[global]
 	#append the following in the global section.
@@ -188,125 +151,111 @@ configuration issues. For example::
 	debug rgw = 20
 
 
-Distribute updated Ceph configuration file
+分发更新后的 Ceph 配置文件
 ==========================================
 
-The updated Ceph configuration file needs to be distributed to all Ceph cluster
-nodes from the ``admin node``.
+更新后的 Ceph 配置文件需要从 ``admin node`` 分发到 Ceph 集群节点上.
 
-It involves the following steps:
+它包含以下步骤:
 
-#. Pull the updated ``ceph.conf`` from ``/etc/ceph/`` to the root directory of
-   the cluster in admin node (e.g. ``my-cluster`` directory). The contents of
-   ``ceph.conf`` in ``my-cluster`` will get overwritten. To do so, execute the
-   following::
+#. 将更新后 ``ceph.conf`` 从 ``/etc/ceph/`` 目录拷贝到管理节点上新建集群时的根目录中 \
+   (比如. ``my-cluster`` 目录). 因此 ``my-cluster`` 中``ceph.conf`` 将会被覆盖. \
+   为此,执行下面的命令::
 
 		ceph-deploy --overwrite-conf config pull {hostname}
 
-   Here, ``{hostname}`` is the short hostname of the Ceph admin node.
+   这里, ``{hostname}`` 是 Ceph 管理节点的精简主机名.
 
-#. Push the updated ``ceph.conf`` file from the admin node to all other nodes in
-   the cluster including the ``gateway host``::
+#. 将更新后 ``ceph.conf`` f文件从管理节点推送到集群中其他所有节点，包含 ``gateway host``::
 
 		ceph-deploy --overwrite-conf config push [HOST] [HOST...]
 
-   Give the hostnames of the other Ceph nodes in place of ``[HOST] [HOST...]``.
+   使用其他 Ceph 节点的主机名代替上面命令中的 ``[HOST] [HOST...]``.
 
 
-Copy ceph.client.admin.keyring from admin node to gateway host
+从管理节点拷贝 ceph.client.admin.keyring 到网关主机
 ==============================================================
 
-As the ``gateway host`` can be a different node that is not part of the cluster,
-the ``ceph.client.admin.keyring`` needs to be copied from the ``admin node`` to
-the ``gateway host``. To do so, execute the following on ``admin node``::
+因为 ``gateway host`` 有可能是集群之外的其他节点,所以需要将 ``ceph.client.admin.keyring`` \
+从 ``admin node`` 拷贝到 ``gateway host``. 为此,在 ``admin node`` 上执行下面的命令::
 
 	sudo scp /etc/ceph/ceph.client.admin.keyring  ceph@{hostname}:/home/ceph
 	ssh {hostname}
 	sudo mv ceph.client.admin.keyring /etc/ceph/ceph.client.admin.keyring
 
 
-.. note:: The above step need not be executed if ``admin node`` is the
-   ``gateway host``.
+.. note:: 如果你的 ``admin node`` 就是 ``gateway host`` 则无需执行上面的步骤.
 
 
-Create Data Directory
+新建数据目录
 =====================
+ 
+部署脚本不会创建默认的 Ceph 对象网关数据目录. 因此需要为每一个 ``radosgw`` 守护进程实例新建\
+数据目录. Ceph 配置文件中的 ``host`` 变量决定了在哪一个主机上运行 ``radosgw`` 守护进程实例.\
+数据目录的典型命名规则是指定 ``radosgw`` 守护进程,集群名和守护进程 ID.
 
-Deployment scripts may not create the default Ceph Object Gateway data
-directory. Create data directories for each instance of a ``radosgw``
-daemon (if you haven't done so already). The ``host`` variables in the
-Ceph configuration file determine which host runs each instance of a
-``radosgw`` daemon. The typical form specifies the ``radosgw`` daemon,
-the cluster name and the daemon ID.
-
-To create the directory on the ``gateway host``, execute the following::
+执行下面的命令在 ``gateway host`` 上新建所需的数据目录::
 
 	sudo mkdir -p /var/lib/ceph/radosgw/ceph-radosgw.gateway
 
 
-Adjust Socket Directory Permissions
+调整 Socket 目录权限
 ===================================
 
-On some distros, the ``radosgw`` daemon runs as the unprivileged ``apache``
-UID, and this UID must have write access to the location where it will write
-its socket file.
+在一些发行版中, ``radosgw`` 守护进程是以没有什么权利的 UID 为 ``apache`` 的用户运行的, 但\
+是这个 UID 必须在运行时写入 socket 文件的目录中具备写权限.
 
-To grant permissions to the default socket location, execute the following on
-the ``gateway host``::
+在 ``gateway host`` 上执行下面的命令来给上述 UID 授予默认 socket 位置的权限::
 
 	sudo chown apache:apache /var/run/ceph
 
 
-Change Log File Owner
+改变日志文件所有者
 =====================
 
-On some distros, the ``radosgw`` daemon runs as the unprivileged ``apache`` UID,
-but the ``root`` user owns the log file by default. You must change it to the
-``apache`` user so that Apache can populate the log file. To do so, execute
-the following::
+在一些发行版中, ``radosgw`` 守护进程是以没有什么权利的 UID 为 ``apache`` 的用户运行的,
+但是日志文件默认是 ``root`` 用户所有的. 你必须日志文件的将所有者修改 ``apache`` 用户,以\
+便 Apache 可以在这里写入日志文件. 为此，执行下面的命令::
 
 	sudo chown apache:apache /var/log/radosgw/client.radosgw.gateway.log
 
 
-Start radosgw service
+启动 radosgw 服务
 =====================
 
-The Ceph Object gateway daemon needs to be started. To do so, execute the
-following on the ``gateway host``:
+Ceph 对象网关守护进程需要启动. 为此，在 ``gateway host`` 上执行下面的命令:
 
-On Debian-based distros::
+在基于 Debian 的发行版上::
 
 	sudo /etc/init.d/radosgw start
 
-On RPM-based distros::
+在基于 RPM 的发行版上::
 
 	sudo /etc/init.d/ceph-radosgw start
 
 
-Create a Gateway Configuration file
+新建一个网关配置文件
 ===================================
 
-On the host where you installed the Ceph Object Gateway i.e, ``gateway host``,
-create an ``rgw.conf`` file. Place the file in ``/etc/apache2/conf-available``
-directory for ``Debian-based`` distros and in ``/etc/httpd/conf.d`` directory
-for ``RPM-based`` distros. It is a Apache configuration file which is needed
-for the ``radosgw`` service. This file must be readable by the web server.
+在你安装了 Ceph 对象网关的主机上, 比如 ``gateway host``, 新建一个 ``rgw.conf`` 文件, 对\
+于 ``Debian-based`` 发行版将该文件放在 ``/etc/apache2/conf-available`` 目录下,对于 \
+``RPM-based`` 发行版则将其放在 ``/etc/httpd/conf.d`` 目录下. 这个是 ``radosgw`` 所需\
+的一个 Apache 配置文件. 对于 web 服务器而言这个文件必须是可读的.
 
-Execute the following steps:
+按照下面的步骤执行:
 
-#. Create the file:
+#. 新建文件:
 
-   For Debian-based distros, execute::
+   对于基于 Debian 的发行版, 执行::
 
 	sudo vi /etc/apache2/conf-available/rgw.conf
 
-   For RPM-based distros, execute::
+   对于基于 RPM 的发行版, 执行::
 
 	sudo vi /etc/httpd/conf.d/rgw.conf
 
-#. For distros with Apache 2.2 and early versions of Apache 2.4 that use
-   localhost TCP and do not support Unix Domain Socket, add the following
-   contents to the file::
+#. 对于使用 Apache 2.2 或者 Apache 2.4 早期版本的使用 localhost TCP 并且不支持 \
+   Unix Domain Socket 的发行版而言，添加下面的内容到该文件中::
 
 	<VirtualHost *:80>
 	ServerName localhost
@@ -330,7 +279,8 @@ Execute the following steps:
    .. note:: For Debian-based distros replace ``/var/log/httpd/``
       with ``/var/log/apache2``.
 
-#. For distros with Apache 2.4.9 or later that support Unix Domain Socket,
+#. 对于使用 Apache 2.4.9 或者更新版本的支持 Unix Domain Socket 的发行版而言，添加下面\
+   的内容到该文件中
    add the following contents to the file::
 
 	<VirtualHost *:80>
@@ -353,42 +303,41 @@ Execute the following steps:
 	</VirtualHost>
 
 
-Restart Apache
+重启 Apache
 ==============
 
-The Apache service needs to be restarted to accept the new configuration.
+Apache 服务需要重启来加载新的配置文件.
 
-For Debian-based distros, run::
+对于基于 Debian 的发行版, 执行::
 
 	sudo service apache2 restart
 
-For RPM-based distros, run::
+对于基于 RPM 的发行版, 执行::
 
 	sudo service httpd restart
 
-Or::
+或者::
 
 	sudo systemctl restart httpd
 
 
-Using The Gateway
+使用网关
 =================
 
-To use the REST interfaces, first create an initial Ceph Object Gateway
-user for the S3 interface. Then, create a subuser for the Swift interface.
-See the `Admin Guide`_ for more details on user management.
+为了使用 REST 接口, 首先需要为 S3 接口初始化一个 Ceph 对象网关用户. 然后为 Swift 接口\
+新建一个子用户.
+查看 `管理手册`_ 获取有关用户管理的详细信息.
 
-Create a radosgw user for S3 access
+为 S3 访问新建一个  radosgw 用户
 ------------------------------------
 
-A ``radosgw`` user needs to be created and granted access. The command
-``man radosgw-admin`` will provide information on additional command options.
+A ``radosgw`` 用户需要新建并且赋予访问权限. 命令 ``man radosgw-admin`` 将展示提供更多额外的命令选项信息.
 
-To create the user, execute the following on the ``gateway host``::
+为了新建用户, 在 ``gateway host`` 上执行下面的命令::
 
 	sudo radosgw-admin user create --uid="testuser" --display-name="First User"
 
-The output of the command will be something like the following::
+上述命令的输出结果类似下面这样::
 
 	{"user_id": "testuser",
 	"display_name": "First User",
@@ -415,8 +364,8 @@ The output of the command will be something like the following::
 	"temp_url_keys": []}
 
 
-.. note:: 验证访问时， ``keys->access_key`` 和 ``keys->secret_key`` \
-   的值是必需的。
+.. note:: ``keys->access_key`` 和 ``keys->secret_key`` 两个值\
+   在访问时是必需的，用来验证。
 
 
 创建一个 Swift 用户
@@ -509,29 +458,28 @@ The output of the command will be something like the following::
 测试 S3 访问
 ------------
 
-You need to write and run a Python test script for verifying S3 access. The S3
-access test script will connect to the ``radosgw``, create a new bucket and list
-all buckets. The values for ``aws_access_key_id`` and ``aws_secret_access_key``
-are taken from the values of ``access_key`` and ``secret_key`` returned by the
-``radosgw_admin`` command.
+你需要写一个 Python 测试脚本,并运行它以验证 S3 访问. S3 访问测试脚本\
+将会连接 ``radosgw``, 然后新建一个新的 bucket 再列出所有的 buckets.\
+``aws_access_key_id`` 和 ``aws_secret_access_key`` 的值就是前面\
+``radosgw_admin`` 命令的返回值中的 ``access_key`` 和 ``secret_key``.
 
-Execute the following steps:
+执行下面的步骤:
 
-#. You will need to install the ``python-boto`` package.
+#. 首先你需要安装 ``python-boto`` 包.
 
-   For Debian-based distros, run::
+   对于基于 Debian 的发行版请执行::
 
 		sudo apt-get install python-boto
 
-   For RPM-based distros, run::
+   对于基于 RPM 的发行版请执行::
 
 		sudo yum install python-boto
 
-#. Create the Python script::
+#. 新建 Python 脚本::
 
 	vi s3test.py
 
-#. Add the following contents to the file::
+#. 添加下面的内容到该文件中::
 
 	import boto
 	import boto.s3.connection
@@ -551,52 +499,50 @@ Execute the following steps:
 			created = bucket.creation_date,
 	)
 
-   Replace ``{hostname}`` with the hostname of the host where you have
-   configured the gateway service i.e, the ``gateway host``.
+   将 ``{hostname}`` 替换为你配置了网关服务的主机的主机名,比如 ``gateway host``.
 
-#. Run the script::
+#. 运行这个脚本::
 
 	python s3test.py
 
-   The output will be something like the following::
+   输出类似下面的内容::
 
 		my-new-bucket 2015-02-16T17:09:10.000Z
 
-Test swift access
+测试 swift 访问
 -----------------
 
-Swift access can be verified via the ``swift`` command line client. The command
-``man swift`` will provide more information on available command line options.
+Swift 访问能够通过 ``swift`` 命令行客户端来验证. 命令 ``man swift`` 将提供更多、
+可用命令行选项的详细信息.
 
-To install ``swift`` client, execute the following:
+执行下面的命令安装``swift`` 客户端:
 
-   For Debian-based distros::
+   对于基于 Debian 的发行版::
 
 		sudo apt-get install python-setuptools
 		sudo easy_install pip
 		sudo pip install --upgrade setuptools
 		sudo pip install --upgrade python-swiftclient
 
-   For RPM-based distros::
+   对于基于 RPM 的发行版::
 
 		sudo yum install python-setuptools
 		sudo easy_install pip
 		sudo pip install --upgrade setuptools
 		sudo pip install --upgrade python-swiftclient
 
-To test swift access, execute the following::
+执行下面的命令验证 swift 访问::
 
 	swift -A http://{IP ADDRESS}/auth/1.0 -U testuser:swift -K ‘{swift_secret_key}’ list
 
-Replace ``{IP ADDRESS}`` with the public IP address of the gateway server and
-``{swift_secret_key}`` with its value from the output of
-``radosgw-admin key create`` command executed for the ``swift`` user.
+将其中的 ``{IP ADDRESS}`` 替换为网关服务器的外网访问IP地址,将 ``{swift_secret_key}`` 替换为\
+为 ``swift`` 用户所执行的 ``radosgw-admin key create`` 命令的输出.
 
-For example::
+举例如下::
 
 	swift -A http://10.19.143.116/auth/1.0 -U testuser:swift -K ‘244+fz2gSqoHwR3lYtSbIyomyPHf3i7rgSJrF/IA’ list
 
-The output should be::
+输出如下::
 
 	my-new-bucket
 
@@ -604,8 +550,8 @@ The output should be::
 
 
 .. _配置参考——存储池: ../config-ref#pools
-.. _Pool Configuration: ../../rados/configuration/pool-pg-config-ref/
-.. _Pools: ../../rados/operations/pools
+.. _资源池配置: ../../rados/configuration/pool-pg-config-ref/
+.. _资源池: ../../rados/operations/pools
 .. _用户管理: ../../rados/operations/user-management
-.. _Backport support for UDS in Ubuntu Trusty: https://bugs.launchpad.net/ubuntu/+source/apache2/+bug/1411030
-.. _Admin Guide: ../admin
+.. _Ubuntu Trusty 中支持 UDS 的补丁: https://bugs.launchpad.net/ubuntu/+source/apache2/+bug/1411030
+.. _管理手册: ../admin
