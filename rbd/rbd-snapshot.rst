@@ -273,7 +273,7 @@ ID 意味着你可以把一个存储池内的快照克隆到其他存储池。
 
 
 .. _cephx: ../../rados/configuration/auth-config-ref/
-.. _用户管理: ../../operations/user-management
+.. _用户管理: ../../rados/configuration/user-management
 .. _QEMU: ../qemu-rbd/
 .. _OpenStack: ../rbd-openstack/
 .. _CloudStack: ../rbd-cloudstack/

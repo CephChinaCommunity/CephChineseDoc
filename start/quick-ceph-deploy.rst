@@ -92,6 +92,10 @@
 
 .. note:: 只有在安装 Hammer 或更高版时才会创建 bootstrap-rgw 密钥环。
 
+.. note:: 如果此步失败并输出类似于如下信息 “Unable to find /etc/ceph/ceph.\
+   client.admin.keyring”，请确认 ceph.conf 中为 monitor 指定的 IP 是 Public \
+   IP，而不是 Private IP。
+
 #. 添加两个 OSD 。为了快速地安装，这篇快速入门把目录而非整个硬盘用于 OSD 守护\
    进程。如何为 OSD 及其日志使用独立硬盘或分区，请参考 `ceph-deploy osd`_ 。登\
    录到 Ceph 节点、并给 OSD 守护进程创建一个目录。 ::
@@ -168,7 +172,7 @@ Ceph Monitor ，以形成 Monitors 的法定人数。
 
 .. ditaa::
            /------------------\         /----------------\
-           |    ceph–deploy   |         |     node1      |
+           |    ceph-deploy   |         |     node1      |
            |    Admin Node    |         | cCCC           |
            |                  +-------->+   mon.node1    |
            |                  |         |     osd.2      |
@@ -346,8 +350,8 @@ Ceph 客户端检出最新集群运行图，用 CRUSH 算法计算出如何把�
 .. _ceph-deploy install -h: ../../rados/deployment/ceph-deploy-install
 .. _ceph-deploy new -h: ../../rados/deployment/ceph-deploy-new
 .. _ceph-deploy osd: ../../rados/deployment/ceph-deploy-osd
-.. _用 Upstart 运行 Ceph: ../../rados/operations/operating#running-ceph-with-upstart
-.. _用 sysvinit 运行 Ceph: ../../rados/operations/operating#running-ceph-with-sysvinit
+.. _用 Upstart 运行 Ceph: ../../rados/operations/operating#rupstart-ceph
+.. _用 sysvinit 运行 Ceph: ../../rados/operations/operating#sysvinit-ceph
 .. _CRUSH 图: ../../rados/operations/crush-map
 .. _存储池: ../../rados/operations/pools
 .. _归置组: ../../rados/operations/placement-groups

@@ -1,12 +1,12 @@
 :orphan:
 
 =================================
- rbd-replay -- 重放 RBD 工作负荷
+ rbd-replay -- 重放 RBD 工作载荷
 =================================
 
 .. program:: rbd-replay
 
-提纲
+摘要
 ====
 
 | **rbd-replay** [ *options* ] *replay_file*
@@ -23,8 +23,8 @@
 
 .. option:: -c ceph.conf, --conf ceph.conf
 
-   使用 ceph.conf 配置文件而非默认的 /etc/ceph/ceph.conf 来确定启动期间所需\
-   的监视器地址。
+   使用 ceph.conf 配置文件，而不是用默认的 /etc/ceph/ceph.conf 来确\
+   定启动时需要的 monitor 地址。
 
 .. option:: -p pool, --pool pool
 
@@ -32,7 +32,7 @@
 
 .. option:: --latency-multiplier
 
-   请求间延时加倍，默认为 1 。
+   请求间的延时倍数，默认为 1 。
 
 .. option:: --read-only
 
@@ -40,7 +40,7 @@
 
 .. option:: --map-image rule
 
-   增加一条规则把跟踪文件中的映像名映射为重放集群中的映像名。此规则 \
+   增加一条规则把跟踪文件中的映像名映射为重放集群中的映像名。规则 \
    image1@snap1=image2@snap2 将把 image1 的快照 snap1 映射为 image2 的快照 \
    snap2 。
 
@@ -52,7 +52,7 @@
    本而不同。
 
 
-实例
+样例
 ====
 
 尽可能快地重放 workload1::
@@ -67,12 +67,12 @@
 使用范围
 ========
 
-**rbd-replay** 是 Ceph 的一部分，这是个伸缩力强、开源、分布式的存储系统，\
-更多信息参见 http://ceph.com/docs 。
+**rbd-replay** 是 Ceph 的一部分，这是个大规模可伸缩、开源、分布式的\
+存储系统，更多信息参见 http://ceph.com/docs 或 http://docs.ceph.org.cn/。
 
 
-参考
-====
+另请参阅
+========
 
 :doc:`rbd-replay-prep <rbd-replay-prep>`\(8),
 :doc:`rbd <rbd>`\(8)
