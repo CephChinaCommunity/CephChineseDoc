@@ -1,12 +1,12 @@
 :orphan:
 
-=========================================================
- rbd-replay-prep -- 预处理捕捉到的用于重放工作负荷的 RBD
-=========================================================
+===============================================================
+ rbd-replay-prep -- 对捕捉到的用于重放的 RBD 工作载荷进行预处理
+===============================================================
 
 .. program:: rbd-replay-prep
 
-提纲
+摘要
 ====
 
 | **rbd-replay-prep** [ --window *seconds* ] [ --anonymize ] *trace_dir* *replay_file*
@@ -23,7 +23,7 @@
 
 .. option:: --window seconds
 
-   请求多于 'seconds' 秒之后被认为是独立的。
+   超过 'seconds' 秒之后的请求被认为是独立的。
 
 .. option:: --anonymize
 
@@ -34,10 +34,10 @@
    把所有处理过的事件打印到控制台。
 
 
-实例
+样例
 ====
 
-要预处理 workload1-trace 以便重放： ::
+预处理 workload1-trace 以便重放： ::
 
        rbd-replay-prep workload1-trace/ust/uid/1000/64-bit workload1
 
@@ -45,12 +45,12 @@
 使用范围
 ========
 
-**rbd-replay-prep** 是 Ceph 的一部分，这是个伸缩力强、开源、分布式的存储系统，\
-更多信息参见 http://ceph.com/docs 。
+**rbd-replay-prep** 是 Ceph 的一部分，这是个大规模可伸缩、开源、分布式的\
+存储系统，更多信息参见 http://ceph.com/docs 或 http://docs.ceph.org.cn/。
 
 
-参考
-====
+另请参阅
+========
 
 :doc:`rbd-replay <rbd-replay>`\(8),
 :doc:`rbd <rbd>`\(8)
