@@ -7,7 +7,7 @@
 .. program:: ceph-rbdnamer
 
 
-提纲
+摘要
 ====
 
 | **ceph-rbdnamer** *num*
@@ -25,12 +25,12 @@ udev （使用类似如下的规则）设置设备的符号链接： ::
 使用范围
 ========
 
-**ceph-rbdnamer** 是 Ceph 的一部分，这是个伸缩力强、开源、分布式的存储系统，\
-更多信息参见 http://ceph.com/docs 。
+**ceph-rbdnamer** 是 Ceph 的一部分，这是个大规模可伸缩、开源、分布式的\
+存储系统，更多信息参见 http://ceph.com/docs 或 http://docs.ceph.org.cn/。
 
 
-参考
-====
+另请参阅
+========
 
 :doc:`rbd <rbd>`\(8),
 :doc:`ceph <ceph>`\(8)
