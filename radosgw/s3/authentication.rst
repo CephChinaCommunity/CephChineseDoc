@@ -1,16 +1,16 @@
 =========================
- Authentication and ACLs
+ 认证和 ACLs
 =========================
 
-Requests to the RADOS Gateway (RGW) can be either authenticated or
-unauthenticated. RGW assumes unauthenticated requests are sent by an anonymous
-user. RGW supports canned ACLs.
+到 RADOS 网关的 Requests 请求可能已经经过验证也可能没有经 \
+过验证。RGW 假设所有未经验证的请求都是由匿名用户发送的。RGW \
+支持预置的 ACLs。
 
-Authentication
+认证
 --------------
-Authenticating a request requires including an access key and a Hash-based
-Message Authentication Code (HMAC) in the request before it is sent to the
-RGW server. RGW uses an S3-compatible authentication approach.
+对请求进行身份验证需要在它发送到 RGW 服务器之前就包含一个 \
+access 密钥和基于散列消息验证码(HMAC)。RGW 使用兼容 S3 \
+的身份验证方法。
 
 ::
 
@@ -18,44 +18,44 @@ RGW server. RGW uses an S3-compatible authentication approach.
 	PUT /buckets/bucket/object.mpeg
 	Host: cname.domain.com
 	Date: Mon, 2 Jan 2012 00:01:01 +0000
-	Content-Encoding: mpeg
+	Content-Encoding: mpeg	
 	Content-Length: 9999999
 
 	Authorization: AWS {access-key}:{hash-of-header-and-secret}
 
-In the foregoing example, replace ``{access-key}`` with the value for your access
-key ID followed by a colon (``:``). Replace ``{hash-of-header-and-secret}`` with
-a hash of the header string and the secret corresponding to the access key ID.
+在上述例子中，使用你自己的 access 密钥代替 ``{access-key}`` ，在其后跟着加入一个冒 \
+号 (``:``)。将头字符串和 secret 密钥 hash 之后的结果替换 ``{hash-of-header-and-secret}`` ，\
+这里的 secret 必须是跟你前面使用的 access 配对的密钥。
 
-To generate the hash of the header string and secret, you must:
+要生成头字符串和 secret 密钥的 hash 结果，你必须：
 
-#. Get the value of the header string.
-#. Normalize the request header string into canonical form.
-#. Generate an HMAC using a SHA-1 hashing algorithm.
-   See `RFC 2104`_ and `HMAC`_ for details.
-#. Encode the ``hmac`` result as base-64.
+#. 获取头字符串
+#. 将请求头字符串格式化为规范格式 
+#. 使用 SHA-1 hashing 算法生成 HMAC
+   查看 `RFC 2104`_ 和 `HMAC`_ 获取详细信息
+#. 使用 base-64 将 ``hmac`` 结果再次编码
 
-To normalize the header into canonical form:
+将请求头字符串格式化为规范格式: 
 
-#. Get all fields beginning with ``x-amz-``.
-#. Ensure that the fields are all lowercase.
-#. Sort the fields lexicographically.
-#. Combine multiple instances of the same field name into a
-   single field and separate the field values with a comma.
-#. Replace white space and line breaks in field values with a single space.
-#. Remove white space before and after colons.
-#. Append a new line after each field.
-#. Merge the fields back into the header.
+#. 获取所有以 ``x-amz-`` 开头的所有字段
+#. 确保这些字段都是小写字母
+#. 按照字母顺序将这些字段排序 
+#. 将多个实例中相同的字段名称合并到一个单个字段中
+   在这个字段中使用逗号分隔这些值
+#. 将字段的值中的空格和换行符替换为单个空格
+#. 删除冒号前后的空格
+#. 在每个字段后追加一个空行
+#. 将所有字段合并到头字符串中
 
-Replace the ``{hash-of-header-and-secret}`` with the base-64 encoded HMAC string.
+将 HMAC 字符串使用 base-64编码的结果替换 ``{hash-of-header-and-secret}`` 
 
-Access Control Lists (ACLs)
+访问控制列表 (ACLs)
 ---------------------------
 
-RGW supports S3-compatible ACL functionality. An ACL is a list of access grants
-that specify which operations a user can perform on a bucket or on an object.
-Each grant has a different meaning when applied to a bucket versus applied to
-an object:
+RGW 支持兼容 S3 ACL 的功能。ACL 是一个授权访问控制 \
+列表，它指定了用户针对一个 bucket 或者一个对象能够执 \
+行哪些操作。针对一个 bucket 或者一个对象的每次授权都 \
+有不同的含义:
 
 +------------------+--------------------------------------------------------+----------------------------------------------+
 | Permission       | Bucket                                                 | Object                                       |

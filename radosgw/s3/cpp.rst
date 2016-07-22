@@ -6,7 +6,7 @@ S3 的 C++ 接口实例
 配置
 ----
 
-The following contains includes and globals that will be used in later examples:
+下面的 includes 和 globals 将会在随后的例子中用到:
 
 .. code-block:: cpp
 
@@ -54,10 +54,10 @@ The following contains includes and globals that will be used in later examples:
 	};
 
 
-Creating (and Closing) a Connection
+新建 (和关闭) 一个连接
 -----------------------------------
 
-This creates a connection so that you can interact with the server.
+下面的代码将新建一个连接用来很服务器进行交互.
 
 .. code-block:: cpp
 
@@ -66,12 +66,12 @@ This creates a connection so that you can interact with the server.
 	S3_deinitialize();
 
 
-Listing Owned Buckets
----------------------
+列出当前用户的所有 Bucket
+--------------------------
 
-This gets a list of Buckets that you own.
-This also prints out the bucket name, owner ID, and display name
-for each bucket.
+下面的代码会列出你所有的 bucket 的列表。
+这也会打印出每个bucket的 bucket 名、所有者 ID \
+和显示名称
 
 .. code-block:: cpp
 
@@ -108,22 +108,22 @@ for each bucket.
 	S3_list_service(S3ProtocolHTTP, access_key, secret_key, host, 0, &listServiceHandler, &header_printed);
 
 
-Creating a Bucket
+新建一个 Bucket
 -----------------
 
-This creates a new bucket.
+这会新建一个 bucket。
 
 .. code-block:: cpp
 
 	S3_create_bucket(S3ProtocolHTTP, access_key, secret_key, host, sample_bucket, S3CannedAclPrivate, NULL, NULL, &responseHandler, NULL);
 
 
-Listing a Bucket's Content
+列出 Bucket 的内容
 --------------------------
 
-This gets a list of objects in the bucket.
-This also prints out each object's name, the file size, and
-last modified date.
+下面的代码会输出 bucket 内的所有对象列表。
+这也会打印出每一个对象的名字、文件尺寸和\
+最近修改时间。
 
 .. code-block:: cpp
 
@@ -164,28 +164,28 @@ last modified date.
 	};
 	S3_list_bucket(&bucketContext, NULL, NULL, NULL, 0, NULL, &listBucketHandler, NULL);
 
-The output will look something like this::
+输出形式类似下面这样::
 
    myphoto1.jpg	251262	2011-08-08T21:35:48.000Z
    myphoto2.jpg	262518	2011-08-08T21:38:01.000Z
 
 
-Deleting a Bucket
+删除一个 Bucket
 -----------------
 
 .. note::
 
-   The Bucket must be empty! Otherwise it won't work!
+   Bucket必须为空！否则它不会工作!
 
 .. code-block:: cpp
 
 	S3_delete_bucket(S3ProtocolHTTP, S3UriStylePath, access_key, secret_key, host, sample_bucket, NULL, &responseHandler, NULL);
 
 
-Creating an Object (from a file)
+新建一个对象 (来源于一个文件)
 --------------------------------
 
-This creates a file ``hello.txt``.
+下面的代码会新建一个文件``hello.txt``.
 
 .. code-block:: cpp
 
@@ -237,10 +237,10 @@ This creates a file ``hello.txt``.
 	S3_put_object(&bucketContext, sample_key, contentLength, NULL, NULL, &putObjectHandler, &data);
 
 
-Download an Object (to a file)
+下载一个对象 (到文件)
 ------------------------------
 
-This downloads a file and prints the contents.
+下面的代码会下载一个文件并打印它的内容.
 
 .. code-block:: cpp
 
@@ -260,10 +260,10 @@ This downloads a file and prints the contents.
 	S3_get_object(&bucketContext, sample_key, NULL, 0, 0, NULL, &getObjectHandler, outfile);
 
 
-Delete an Object
+删除一个对象
 ----------------
 
-This deletes an object.
+下面的代码会删除一个对象.
 
 .. code-block:: cpp
 
@@ -275,10 +275,10 @@ This deletes an object.
 	S3_delete_object(&bucketContext, sample_key, 0, &deleteResponseHandler, 0);
 
 
-Change an Object's ACL
+改变一个对象的 ACL
 ----------------------
 
-This changes an object's ACL to grant full control to another user.
+下面的代码会改变一个对象的 ACL 来授权所有控制给另一个用户.
 
 
 .. code-block:: cpp
@@ -316,10 +316,10 @@ This changes an object's ACL to grant full control to another user.
 	S3_set_acl(&bucketContext, sample_key, ownerId, ownerDisplayName, 3, grants, 0, &responseHandler, 0);
 
 
-Generate Object Download URL (signed)
+生成对象下载 URL (带签名)
 -------------------------------------
 
-This generates a signed download URL that will be valid for 5 minutes.
+下面的代码会生成一个带签名的有效时间为5分钟的下载URL
 
 .. code-block:: cpp
 

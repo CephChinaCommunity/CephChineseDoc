@@ -1,8 +1,7 @@
 .. _ruby:
 
-Ruby `AWS::SDK`_ Examples (aws-sdk gem ~>2)
+Ruby `AWS::SDK`_ 样例 (aws-sdk gem ~>2)
 ===========================================
-
 
 设置
 ----
@@ -20,18 +19,17 @@ Ruby `AWS::SDK`_ Examples (aws-sdk gem ~>2)
 	)
 
 
-并把对象客户端实例化：
+并把客户端对象实例化：
 
 .. code-block:: ruby
 
     	s3_client = Aws::S3::Client.new
 
+列出用户的所有 bucket
+-------------------------------
 
-罗列拥有的桶
-------------
-
-This gets a list of buckets that you own.
-This also prints out the bucket name and creation date of each bucket.
+下面的代码会列出你的 bucket 的列表。
+这也会打印出每个bucket的 bucket 名和创建时间。
 
 .. code-block:: ruby
 
@@ -39,37 +37,37 @@ This also prints out the bucket name and creation date of each bucket.
 		puts "#{bucket.name}\t#{bucket.creation_date}"
 	end
 
-The output will look something like this::
+输出形式类似下面这样::
 
    mahbuckat1	2011-04-21T18:05:39.000Z
    mahbuckat2	2011-04-21T18:05:48.000Z
    mahbuckat3	2011-04-21T18:07:18.000Z
 
 
-新建一个桶
-----------
+新建一个 Bucket
+-------------------
 
-This creates a new bucket called ``my-new-bucket``
+下面的代码会新建一个名为 ``my-new-bucket`` 的bucket。
 
 .. code-block:: ruby
 
 	s3_client.create_bucket(bucket: 'my-new-bucket')
 
-If you want a private bucket: 
+如果你想要新建一个私有bucket: 
 
-`acl` option accepts: # private, public-read, public-read-write, authenticated-read
+`acl` 选项接收的参数有: # private, public-read, public-read-write, authenticated-read
 
 .. code-block:: ruby
 
 	s3_client.create_bucket(bucket: 'my-new-bucket', acl: 'private')
 
 
-罗列桶的内容
-------------
+列出 bucket 的内容
+--------------------------
 
-This gets a list of hashes with the contents of each object
-This also prints out each object's name, the file size, and last
-modified date.
+下面的代码会输出 bucket 内的所有对象列表。
+这也会打印出每一个对象的名字、文件尺寸和\
+最近修改时间。
 
 .. code-block:: ruby
 
@@ -77,43 +75,41 @@ modified date.
 		puts "#{object.key}\t#{object.size}\t#{object.last-modified}"
 	end
 
-The output will look something like this if the bucket has some files::
+如果 bucket 内有文件，输出形式类似下面这样::
 
    myphoto1.jpg	251262	2011-08-08T21:35:48.000Z
-   myphoto2.jpg	262518	2011-08-08T21:38:01.000Z
+   myphoto2.j‰g	262518	2011-08-08T21:38:01.000Z
 
 
 删除桶
 ------
-
 .. note::
-   The Bucket must be empty! Otherwise it won't work!
+   Bucket必须为空！否则它不会工作!
 
 .. code-block:: ruby
 
 	s3_client.delete_bucket(bucket: 'my-new-bucket')
 
 
-强行删除非空桶
---------------
-
-First, you need to clear the bucket:
+强行删除非空 bucket
+-------------------------
+首先，你需要清空这个 bucket:
 
 .. code-block:: ruby
 
 	Aws::S3::Bucket.new('my-new-bucket', client: s3_client).clear!
 	
-after, you can destroy the bucket
+然后删除这个 bucket
 
 .. code-block:: ruby
 
 	s3_client.delete_bucket(bucket: 'my-new-bucket')
 
 
-创建对象
---------
+新建一个对象
+------------------
 
-This creates a file ``hello.txt`` with the string ``"Hello World!"``
+下面的代码会新建一个内容是字符串``"Hello World!"`` 的文件 ``hello.txt``。
 
 .. code-block:: ruby
 
@@ -125,11 +121,11 @@ This creates a file ``hello.txt`` with the string ``"Hello World!"``
 	)
 
 
-更改某一对象的 ACL
-------------------
+修改一个对象的 ACL
+----------------------
 
-This makes the object ``hello.txt`` to be publicly readable, and ``secret_plans.txt``
-to be private.
+下面的代码会将对象 ``hello.txt`` 的权限变为公开可读，而将
+``secret_plans.txt`` 的权限设为私有。
 
 .. code-block:: ruby
 
@@ -138,36 +134,36 @@ to be private.
 	s3_client.put_object_acl(bucket: 'my-new-bucket', key: 'private.txt', acl: 'private')
 
 
-下载一对象（到文件）
---------------------
+下载一个对象 (到文件)
+------------------------------
 
-This downloads the object ``poetry.pdf`` and saves it in
-``/home/larry/documents/``
+下面的代码会下载对象 ``perl_poetry.pdf`` 并将它存到位置
+``C:\Users\larry\Documents``
 
 .. code-block:: ruby
 
 	s3_client.get_object(bucket: 'my-new-bucket', key: 'poetry.pdf', response_target: '/home/larry/documents/poetry.pdf')
 
 
-删除某一对象
-------------
+删除一个对象
+----------------
 
-This deletes the object ``goodbye.txt``
+下面的代码会删除对象 ``goodbye.txt``
 
 .. code-block:: ruby
 
 	s3_client.delete_object(key: 'goodbye.txt', bucket: 'my-new-bucket')
 
 
-生成对象的下载 URL （带签名和不带签名的）
------------------------------------------
+生成对象的下载 URLs (带签名和不带签名)
+---------------------------------------------------
 
-This generates an unsigned download URL for ``hello.txt``. This works
-because we made ``hello.txt`` public by setting the ACL above.
-This then generates a signed download URL for ``secret_plans.txt`` that
-will work for 1 hour. Signed download URLs will work for the time
-period even if the object is private (when the time period is up, the
-URL will stop working).
+下面的代码会为 ``hello.txt`` 生成一个无签名为下载URL。 \
+这个操作是生效是因为前面我们已经设置 ``hello.txt`` 的 \
+ACL 为公开可读。下面的代码同时会为 ``secret_plans.txt`` \
+生成一个有效时间是一个小时的带签名的下载 URL。带签名的下载 \
+URL 在这个时间内是可用的，即使对象的权限是私有(当时间到期后 \
+URL 将不可用)。
 
 .. code-block:: ruby
 
@@ -183,7 +179,7 @@ URL will stop working).
 		client: s3_client
 	).presigned_url(:get, expires_in: 60 * 60)
 
-The output of this will look something like::
+输出形式类似下面这样::
 
    http://objects.dreamhost.com/my-bucket-name/hello.txt
    http://objects.dreamhost.com/my-bucket-name/secret_plans.txt?Signature=XXXXXXXXXXXXXXXXXXXXXXXXXXX&Expires=1316027075&AWSAccessKeyId=XXXXXXXXXXXXXXXXXXX
@@ -192,13 +188,13 @@ The output of this will look something like::
 
 
 
-Ruby `AWS::S3`_ Examples (aws-s3 gem)
+Ruby `AWS::S3`_ 样例 (aws-s3 gem)
 =====================================
 
-Creating a Connection
+新建一个连接
 ---------------------
 
-This creates a connection so that you can interact with the server.
+下面的代码会新建一个连接，这样你就可以和服务器交互.
 
 .. code-block:: ruby
 
@@ -210,11 +206,11 @@ This creates a connection so that you can interact with the server.
 	)
 
 
-Listing Owned Buckets
+列出用户的所有 bucket
 ---------------------
 
-This gets a list of `AWS::S3::Bucket`_ objects that you own.
-This also prints out the bucket name and creation date of each bucket.
+下面的代码会列出一个 `AWS::S3::Bucket`_  对象类型的列表，这代 \
+表你拥有的bucket。这也会打印出每个bucket的 bucket 名和创建时间。
 
 .. code-block:: ruby
 
@@ -222,29 +218,29 @@ This also prints out the bucket name and creation date of each bucket.
 		puts "#{bucket.name}\t#{bucket.creation_date}"
 	end
 
-The output will look something like this::
+输出形式类似下面这样::
 
    mahbuckat1	2011-04-21T18:05:39.000Z
    mahbuckat2	2011-04-21T18:05:48.000Z
    mahbuckat3	2011-04-21T18:07:18.000Z
 
 
-Creating a Bucket
+新建一个 Bucket
 -----------------
 
-This creates a new bucket called ``my-new-bucket``
+下面的代码会新建一个名为 ``my-new-bucket`` 的bucket。
 
 .. code-block:: ruby
 
 	AWS::S3::Bucket.create('my-new-bucket')
 
 
-Listing a Bucket's Content
+列出 bucket 的内容
 --------------------------
 
-This gets a list of hashes with the contents of each object
-This also prints out each object's name, the file size, and last
-modified date.
+下面的代码会输出 bucket 内的所有对象列表。
+这也会打印出每一个对象的名字、文件尺寸和\
+最近修改时间。
 
 .. code-block:: ruby
 
@@ -253,23 +249,23 @@ modified date.
 		puts "#{object.key}\t#{object.about['content-length']}\t#{object.about['last-modified']}"
 	end
 
-The output will look something like this if the bucket has some files::
+如果 bucket 内有文件，输出形式类似下面这样::
 
    myphoto1.jpg	251262	2011-08-08T21:35:48.000Z
    myphoto2.jpg	262518	2011-08-08T21:38:01.000Z
 
 
-Deleting a Bucket
+删除 Bucket
 -----------------
 .. note::
-   The Bucket must be empty! Otherwise it won't work!
+   Bucket必须为空！否则它不会工作!
 
 .. code-block:: ruby
 
 	AWS::S3::Bucket.delete('my-new-bucket')
 
 
-Forced Delete for Non-empty Buckets
+强制删除非空 Buckets
 -----------------------------------
 
 .. code-block:: ruby
@@ -277,10 +273,10 @@ Forced Delete for Non-empty Buckets
 	AWS::S3::Bucket.delete('my-new-bucket', :force => true)
 
 
-Creating an Object
+新建一个对象
 ------------------
 
-This creates a file ``hello.txt`` with the string ``"Hello World!"``
+下面的代码会新建一个内容是字符串``"Hello World!"`` 的文件 ``hello.txt``。
 
 .. code-block:: ruby
 
@@ -292,11 +288,11 @@ This creates a file ``hello.txt`` with the string ``"Hello World!"``
 	)
 
 
-Change an Object's ACL
+修改一个对象的 ACL
 ----------------------
 
-This makes the object ``hello.txt`` to be publicly readable, and ``secret_plans.txt``
-to be private.
+下面的代码会将对象 ``hello.txt`` 的权限变为公开可读，而将
+``secret_plans.txt`` 的权限设为私有。
 
 .. code-block:: ruby
 
@@ -309,11 +305,11 @@ to be private.
 	AWS::S3::S3Object.acl('secret_plans.txt', 'my-new-bucket', policy)
 
 
-Download an Object (to a file)
+下载一个对象 (到文件)
 ------------------------------
 
-This downloads the object ``poetry.pdf`` and saves it in
-``/home/larry/documents/``
+下面的代码会下载对象 ``perl_poetry.pdf`` 并将它存到位置
+``C:\Users\larry\Documents``
 
 .. code-block:: ruby
 
@@ -324,25 +320,25 @@ This downloads the object ``poetry.pdf`` and saves it in
 	end
 
 
-Delete an Object
+删除一个对象
 ----------------
 
-This deletes the object ``goodbye.txt``
+下面的代码会删除对象 ``goodbye.txt``
 
 .. code-block:: ruby
 
 	AWS::S3::S3Object.delete('goodbye.txt', 'my-new-bucket')
 
 
-Generate Object Download URLs (signed and unsigned)
+生成对象的下载 URLs (带签名和不带签名)
 ---------------------------------------------------
 
-This generates an unsigned download URL for ``hello.txt``. This works
-because we made ``hello.txt`` public by setting the ACL above.
-This then generates a signed download URL for ``secret_plans.txt`` that
-will work for 1 hour. Signed download URLs will work for the time
-period even if the object is private (when the time period is up, the
-URL will stop working).
+下面的代码会为 ``hello.txt`` 生成一个无签名为下载URL。 \
+这个操作是生效是因为前面我们已经设置 ``hello.txt`` 的 \
+ACL 为公开可读。下面的代码同时会为 ``secret_plans.txt`` \
+生成一个有效时间是一个小时的带签名的下载 URL。带签名的下载 \
+URL 在这个时间内是可用的，即使对象的权限是私有(当时间到期后 \
+URL 将不可用)。
 
 .. code-block:: ruby
 
@@ -358,7 +354,7 @@ URL will stop working).
 		:expires_in => 60 * 60
 	)
 
-The output of this will look something like::
+输出形式类似下面这样::
 
    http://objects.dreamhost.com/my-bucket-name/hello.txt
    http://objects.dreamhost.com/my-bucket-name/secret_plans.txt?Signature=XXXXXXXXXXXXXXXXXXXXXXXXXXX&Expires=1316027075&AWSAccessKeyId=XXXXXXXXXXXXXXXXXXX

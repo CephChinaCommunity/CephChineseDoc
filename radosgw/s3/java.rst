@@ -1,13 +1,13 @@
 .. _java:
 
-Java S3 Examples
+Java S3 样例
 ================
 
-Setup
+设置
 -----
 
-The following examples may require some or all of the following java
-classes to be imported:
+下面的样例可能需要一些或者所有这里导入 \
+的 java 类
 
 .. code-block:: java
 
@@ -28,10 +28,10 @@ classes to be imported:
 	import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 
-If you are just testing the Ceph Object Storage services, consider
-using HTTP protocol instead of HTTPS protocol. 
+如果你只是测试 Ceph 对象存储服务，考虑使用 \
+HTTP 协议而不是 HTTPS。
 
-First, import the ``ClientConfiguration`` and ``Protocol`` classes. 
+首先，导入 ``ClientConfiguration`` 和 ``Protocol`` 
 
 .. code-block:: java
 
@@ -39,8 +39,8 @@ First, import the ``ClientConfiguration`` and ``Protocol`` classes.
 	import com.amazonaws.Protocol;
 
 
-Then, define the client configuration, and add the client configuration
-as an argument for the S3 client.
+然后，定义客户端配置，并为 S3 客户端添加客户 \
+端配置作为一个参数
 
 .. code-block:: java
 
@@ -53,10 +53,10 @@ as an argument for the S3 client.
 	conn.setEndpoint("endpoint.com");
 
 
-Creating a Connection
+新建一个连接
 ---------------------
 
-This creates a connection so that you can interact with the server.
+下面的代码会新建一个连接，这样你就可以和服务器交互.
 
 .. code-block:: java
 
@@ -68,11 +68,11 @@ This creates a connection so that you can interact with the server.
 	conn.setEndpoint("objects.dreamhost.com");
 
 
-Listing Owned Buckets
+列出用户的所有 bucket
 ---------------------
 
-This gets a list of Buckets that you own.
-This also prints out the bucket name and creation date of each bucket.
+下面的代码会列出你的 bucket 的列表。
+这也会打印出每个bucket的 bucket 名和创建时间。
 
 .. code-block:: java
 
@@ -82,28 +82,28 @@ This also prints out the bucket name and creation date of each bucket.
 			StringUtils.fromDate(bucket.getCreationDate()));
 	}
 
-The output will look something like this::
+输出形式类似下面这样::
 
    mahbuckat1	2011-04-21T18:05:39.000Z
    mahbuckat2	2011-04-21T18:05:48.000Z
    mahbuckat3	2011-04-21T18:07:18.000Z
 
 
-Creating a Bucket
+新建一个 Bucket
 -----------------
 
-This creates a new bucket called ``my-new-bucket``
+下面的代码会新建一个名为 ``my-new-bucket`` 的bucket。
 
 .. code-block:: java
 
 	Bucket bucket = conn.createBucket("my-new-bucket");
 
 
-Listing a Bucket's Content
+列出 bucket 的内容
 --------------------------
-This gets a list of objects in the bucket.
-This also prints out each object's name, the file size, and last
-modified date.
+下面的代码会输出 bucket 内的所有对象列表。
+这也会打印出每一个对象的名字、文件尺寸和\
+最近修改时间。
 
 .. code-block:: java
 
@@ -117,33 +117,33 @@ modified date.
 		objects = conn.listNextBatchOfObjects(objects);
 	} while (objects.isTruncated());
 
-The output will look something like this::
+输出形式类似下面这样::
 
    myphoto1.jpg	251262	2011-08-08T21:35:48.000Z
    myphoto2.jpg	262518	2011-08-08T21:38:01.000Z
 
 
-Deleting a Bucket
+删除 Bucket
 -----------------
 
 .. note::
-   The Bucket must be empty! Otherwise it won't work!
+   Bucket必须为空！否则它不会工作!
 
 .. code-block:: java
 
 	conn.deleteBucket(bucket.getName());
 
 
-Forced Delete for Non-empty Buckets
+强制删除非空 Buckets
 -----------------------------------
 .. attention::
-   not available
+   不支持
 
 
-Creating an Object
+新建一个对象
 ------------------
 
-This creates a file ``hello.txt`` with the string ``"Hello World!"``
+下面的代码会新建一个内容是字符串``"Hello World!"`` 的文件 ``hello.txt``。
 
 .. code-block:: java
 
@@ -151,11 +151,11 @@ This creates a file ``hello.txt`` with the string ``"Hello World!"``
 	conn.putObject(bucket.getName(), "hello.txt", input, new ObjectMetadata());
 
 
-Change an Object's ACL
+修改一个对象的 ACL
 ----------------------
 
-This makes the object ``hello.txt`` to be publicly readable, and
-``secret_plans.txt`` to be private.
+下面的代码会将对象 ``hello.txt`` 的权限变为公开可读，而将
+``secret_plans.txt`` 的权限设为私有。
 
 .. code-block:: java
 
@@ -163,11 +163,11 @@ This makes the object ``hello.txt`` to be publicly readable, and
 	conn.setObjectAcl(bucket.getName(), "secret_plans.txt", CannedAccessControlList.Private);
 
 
-Download an Object (to a file)
+下载一个对象 (到文件)
 ------------------------------
 
-This downloads the object ``perl_poetry.pdf`` and saves it in
-``/home/larry/documents``
+下面的代码会下载对象 ``perl_poetry.pdf`` 并将它存到位置
+``C:\Users\larry\Documents``
 
 .. code-block:: java
 
@@ -177,36 +177,36 @@ This downloads the object ``perl_poetry.pdf`` and saves it in
 	);
 
 
-Delete an Object
+删除一个对象
 ----------------
 
-This deletes the object ``goodbye.txt``
+下面的代码会删除对象 ``goodbye.txt``
 
 .. code-block:: java
 
 	conn.deleteObject(bucket.getName(), "goodbye.txt");
 
 
-Generate Object Download URLs (signed and unsigned)
+生成对象的下载 URLs (带签名和不带签名)
 ---------------------------------------------------
 
-This generates an unsigned download URL for ``hello.txt``. This works
-because we made ``hello.txt`` public by setting the ACL above.
-This then generates a signed download URL for ``secret_plans.txt`` that
-will work for 1 hour. Signed download URLs will work for the time
-period even if the object is private (when the time period is up, the
-URL will stop working).
+下面的代码会为 ``hello.txt`` 生成一个无签名为下载URL。 \
+这个操作是生效是因为前面我们已经设置 ``hello.txt`` 的 \
+ACL 为公开可读。下面的代码同时会为 ``secret_plans.txt`` \
+生成一个有效时间是一个小时的带签名的下载 URL。带签名的下载 \
+URL 在这个时间内是可用的，即使对象的权限是私有(当时间到期后 \
+URL 将不可用)。
 
 .. note::
-   The java library does not have a method for generating unsigned
-   URLs, so the example below just generates a signed URL.
+   C# S3 库不支持生成不带签名的URLs，因此下面的实例只会展 \
+   示如何生成代签名的 URLs.
 
 .. code-block:: java
 
 	GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucket.getName(), "secret_plans.txt");
 	System.out.println(conn.generatePresignedUrl(request));
 
-The output will look something like this::
+输出形式类似下面这样::
 
    https://my-bucket-name.objects.dreamhost.com/secret_plans.txt?Signature=XXXXXXXXXXXXXXXXXXXXXXXXXXX&Expires=1316027075&AWSAccessKeyId=XXXXXXXXXXXXXXXXXXX
 

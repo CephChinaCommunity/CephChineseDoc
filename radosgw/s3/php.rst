@@ -1,12 +1,12 @@
 .. _php:
 
-PHP S3 Examples
+PHP S3 样例
 ===============
 
-Creating a Connection
+新建一个连接
 ---------------------
 
-This creates a connection so that you can interact with the server.
+下面的代码会新建一个连接，这样你就可以和服务器交互.
 
 .. code-block:: php
 
@@ -35,11 +35,11 @@ This creates a connection so that you can interact with the server.
 	$Connection->enable_path_style();
 
 
-Listing Owned Buckets
+列出用户的所有 bucket
 ---------------------
-This gets a list of CFSimpleXML objects representing buckets that you
-own.  This also prints out the bucket name and creation date of each
-bucket.
+下面的代码会生成 CFSimpleXML 类型的对象列表，\
+它代表你拥有的bucket。这也会打印出每个bucket \
+的 bucket 名和创建时间。
 
 .. code-block:: php
 
@@ -50,23 +50,23 @@ bucket.
 		echo $Bucket->Name . "\t" . $Bucket->CreationDate . "\n";
 	}
 
-The output will look something like this::
+输出形式类似下面这样::
 
    mahbuckat1	2011-04-21T18:05:39.000Z
    mahbuckat2	2011-04-21T18:05:48.000Z
    mahbuckat3	2011-04-21T18:07:18.000Z
 
 
-Creating a Bucket
+新建一个 Bucket
 -----------------
 
-This creates a new bucket called ``my-new-bucket`` and returns a
-``CFResponse`` object.
+下面的代码会新建一个名为 ``my-new-bucket`` 的bucket，\
+并返回一个 ``CFResponse`` 对象
 
 .. note::
 
-   This command requires a region as the second argument,
-   so we use ``AmazonS3::REGION_US_E1``, because this constant is ``''``
+   这个命令需要指定 region 作为第二个参数，
+   所以我们使用 ``AmazonS3::REGION_US_E1``, 因为它的内容是 ``''``
 
 .. code-block:: php
 
@@ -74,12 +74,12 @@ This creates a new bucket called ``my-new-bucket`` and returns a
 	$Connection->create_bucket('my-new-bucket', AmazonS3::REGION_US_E1);
 
 
-List a Bucket's Content
+列出 bucket 的内容
 -----------------------
 
-This gets an array of ``CFSimpleXML`` objects representing the objects
-in the bucket. This then prints out each object's name, the file size,
-and last modified date.
+下面的代码会输出 ``CFSimpleXML`` 对象的一个数组，\
+它代表了bucket内的对象。这也会打印出每一个对象的名字、\
+文件尺寸和最近修改时间。
 
 .. code-block:: php
 
@@ -92,26 +92,26 @@ and last modified date.
 
 .. note::
 
-   If there are more than 1000 objects in this bucket,
-   you need to check $ObjectListResponse->body->isTruncated
-   and run again with the name of the last key listed.
-   Keep doing this until isTruncated is not true.
+   如果在这个 bucket 中有超过1000个对象，你需要检查 \
+   $ObjectListResponse->body->isTruncated 的值，\
+   然后使用列出的最后一个 key 的名字再次运行。一直这样 \
+   做直到 isTruncated 的值不再是 true。
 
-The output will look something like this if the bucket has some files::
+如果该 bucket 内有文件，输出形式类似下面这样::
 
    myphoto1.jpg	251262	2011-08-08T21:35:48.000Z
    myphoto2.jpg	262518	2011-08-08T21:38:01.000Z
 
 
-Deleting a Bucket
+删除 Bucket
 -----------------
 
-This deletes the bucket called ``my-old-bucket`` and returns a
-``CFResponse`` object
+下面的代码会删除名为 ``my-old-bucket`` 的 bucket，并返回一个
+``CFResponse`` 对象。
 
 .. note::
 
-   The Bucket must be empty! Otherwise it won't work!
+   Bucket必须为空！否则它不会工作!
 
 .. code-block:: php
 
@@ -119,10 +119,10 @@ This deletes the bucket called ``my-old-bucket`` and returns a
 	$Connection->delete_bucket('my-old-bucket');
 
 
-Forced Delte for Non-empty Buckets
+强制删除非空 Buckets
 ----------------------------------
 
-This will delete the bucket even if it is not empty.
+下面的代码会删除一个 bucket 即使它不是空的。
 
 .. code-block:: php
 
@@ -130,10 +130,10 @@ This will delete the bucket even if it is not empty.
 	$Connection->delete_bucket('my-old-bucket', 1);
 
 
-Creating an Object
+新建一个对象
 ------------------
 
-This creates an object ``hello.txt`` with the string ``"Hello World!"``
+下面的代码会新建一个内容是字符串``"Hello World!"`` 的文件 ``hello.txt``。
 
 .. code-block:: php
 
@@ -143,11 +143,11 @@ This creates an object ``hello.txt`` with the string ``"Hello World!"``
 	));
 
 
-Change an Object's ACL
+修改一个对象的 ACL
 ----------------------
 
-This makes the object ``hello.txt`` to be publicly readable and
-``secret_plans.txt`` to be private.
+下面的代码会将对象 ``hello.txt`` 的权限变为公开可读，而将
+``secret_plans.txt`` 的权限设为私有。
 
 .. code-block:: php
 
@@ -156,10 +156,10 @@ This makes the object ``hello.txt`` to be publicly readable and
 	$Connection->set_object_acl('my-bucket-name', 'secret_plans.txt', AmazonS3::ACL_PRIVATE);
 
 
-Delete an Object
+删除一个对象
 ----------------
 
-This deletes the object ``goodbye.txt``
+下面的代码会删除对象 ``goodbye.txt``
 
 .. code-block:: php
 
@@ -167,11 +167,11 @@ This deletes the object ``goodbye.txt``
 	$Connection->delete_object('my-bucket-name', 'goodbye.txt');
 
 
-Download an Object (to a file)
+下载一个对象 (到文件)
 ------------------------------
 
-This downloads the object ``poetry.pdf`` and saves it in
-``/home/larry/documents/``
+下面的代码会下载对象 ``perl_poetry.pdf`` 并将它存到位置
+``C:\Users\larry\Documents``
 
 .. code-block:: php
 
@@ -182,16 +182,16 @@ This downloads the object ``poetry.pdf`` and saves it in
 	));
 
 
-Generate Object Download URLs (signed and unsigned)
+生成对象的下载 URLs (带签名和不带签名)
 ---------------------------------------------------
 
-This generates an unsigned download URL for ``hello.txt``.
-This works because we made ``hello.txt`` public by setting
-the ACL above. This then generates a signed download URL
-for ``secret_plans.txt`` that will work for 1 hour.
-Signed download URLs will work for the time period even
-if the object is private (when the time period is up,
-the URL will stop working).
+下面的代码会为 ``hello.txt`` 生成一个无签名为下 \
+载URL。这个操作会生效是因为前面我们已经设置 \
+``hello.txt`` 的ACL 为公开可读。下面的代码同时会 \
+为 ``secret_plans.txt`` 生成一个有效时间是一个小 \
+时的带签名的下载 URL。带签名的下载URL 在这个时间内 \
+是可用的，即使对象的权限是私有(当时间到期后URL 将不 \
+可用)。
 
 .. code-block:: php
 
@@ -201,7 +201,7 @@ the URL will stop working).
 	my $secret_url = $Connection->get_object_url('my-bucket-name', 'secret_plans.txt', '1 hour');
 	echo $secret_url . "\n";
 
-The output of this will look something like::
+输出形式类似下面这样::
 
    http://objects.dreamhost.com/my-bucket-name/hello.txt
    http://objects.dreamhost.com/my-bucket-name/secret_plans.txt?Signature=XXXXXXXXXXXXXXXXXXXXXXXXXXX&Expires=1316027075&AWSAccessKeyId=XXXXXXXXXXXXXXXXXXX

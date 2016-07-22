@@ -1,12 +1,12 @@
 .. _perl:
 
-Perl S3 Examples
+Perl S3 样例
 ================
 
-Creating a Connection
+新建一个连接
 ---------------------
 
-This creates a connection so that you can interact with the server.
+下面的代码会新建一个连接，这样你就可以和服务器交互.
 
 .. code-block:: perl
 
@@ -23,11 +23,11 @@ This creates a connection so that you can interact with the server.
 	});
 
 
-Listing Owned Buckets
+列出用户的所有 bucket
 ---------------------
 
-This gets a list of `Amazon::S3::Bucket`_ objects that you own.
-We'll also print out the bucket name and creation date of each bucket.
+下面的代码会获取你拥有的 `Amazon::S3::Bucket`_ 类型的对象列表。
+这也会打印出每个bucket的 bucket 名和创建时间。
 
 .. code-block:: perl
 
@@ -36,29 +36,29 @@ We'll also print out the bucket name and creation date of each bucket.
 		print $bucket->bucket . "\t" . $bucket->creation_date . "\n";
 	}
 
-The output will look something like this::
+输出形式类似下面这样::
 
    mahbuckat1	2011-04-21T18:05:39.000Z
    mahbuckat2	2011-04-21T18:05:48.000Z
    mahbuckat3	2011-04-21T18:07:18.000Z
 
 
-Creating a Bucket
+新建一个 Bucket
 -----------------
 
-This creates a new bucket called ``my-new-bucket``
+下面的代码会新建一个名为 ``my-new-bucket`` 的bucket。
 
 .. code-block:: perl
 
 	my $bucket = $conn->add_bucket({ bucket => 'my-new-bucket' });
 
 
-Listing a Bucket's Content
+列出 bucket 的内容
 --------------------------
 
-This gets a list of hashes with info about each object in the bucket.
-We'll also print out each object's name, the file size, and last
-modified date.
+下面的代码会输出 bucket 内的所有对象列表。
+这也会打印出每一个对象的名字、文件尺寸和\
+最近修改时间。
 
 .. code-block:: perl
 
@@ -67,35 +67,35 @@ modified date.
 		print "$key->{key}\t$key->{size}\t$key->{last_modified}\n";
 	}
 
-The output will look something like this::
+输出形式类似下面这样::
 
    myphoto1.jpg	251262	2011-08-08T21:35:48.000Z
    myphoto2.jpg	262518	2011-08-08T21:38:01.000Z
 
 
-Deleting a Bucket
+删除 Bucket
 -----------------
 
 .. note::
-   The Bucket must be empty! Otherwise it won't work!
+   Bucket必须为空！否则它不会工作!
 
 .. code-block:: perl
 
 	$conn->delete_bucket($bucket);
 
 
-Forced Delete for Non-empty Buckets
+强制删除非空 Buckets
 -----------------------------------
 
 .. attention::
 
-   not available in the `Amazon::S3`_ perl module
+   perl 模块 `Amazon::S3`_ 不支持
 
 
-Creating an Object
+新建一个对象
 ------------------
 
-This creates a file ``hello.txt`` with the string ``"Hello World!"``
+下面的代码会新建一个内容是字符串``"Hello World!"`` 的文件 ``hello.txt``。
 
 .. code-block:: perl
 
@@ -105,11 +105,11 @@ This creates a file ``hello.txt`` with the string ``"Hello World!"``
 	);
 
 
-Change an Object's ACL
+修改一个对象的 ACL
 ----------------------
 
-This makes the object ``hello.txt`` to be publicly readable and
-``secret_plans.txt`` to be private.
+下面的代码会将对象 ``hello.txt`` 的权限变为公开可读，而将
+``secret_plans.txt`` 的权限设为私有。
 
 .. code-block:: perl
 
@@ -123,11 +123,11 @@ This makes the object ``hello.txt`` to be publicly readable and
 	});
 
 
-Download an Object (to a file)
+下载一个对象 (到文件)
 ------------------------------
 
-This downloads the object ``perl_poetry.pdf`` and saves it in
-``/home/larry/documents/``
+下面的代码会下载对象 ``perl_poetry.pdf`` 并将它存到位置
+``C:\Users\larry\Documents``
 
 .. code-block:: perl
 
@@ -135,33 +135,33 @@ This downloads the object ``perl_poetry.pdf`` and saves it in
 		'/home/larry/documents/perl_poetry.pdf');
 
 
-Delete an Object
+删除一个对象
 ----------------
 
-This deletes the object ``goodbye.txt``
+下面的代码会删除对象 ``goodbye.txt``
 
 .. code-block:: perl
 
 	$bucket->delete_key('goodbye.txt');
 
-Generate Object Download URLs (signed and unsigned)
+生成对象的下载 URLs (带签名和不带签名)
 ---------------------------------------------------
-This generates an unsigned download URL for ``hello.txt``. This works
-because we made ``hello.txt`` public by setting the ACL above.
-Then this generates a signed download URL for ``secret_plans.txt`` that
-will work for 1 hour. Signed download URLs will work for the time
-period even if the object is private (when the time period is up, the
-URL will stop working).
+下面的代码会为 ``hello.txt`` 生成一个无签名为下载URL。 \
+这个操作是生效是因为前面我们已经设置 ``hello.txt`` 的 \
+ACL 为公开可读。下面的代码同时会为 ``secret_plans.txt`` \
+生成一个有效时间是一个小时的带签名的下载 URL。带签名的下载 \
+URL 在这个时间内是可用的，即使对象的权限是私有(当时间到期后 \
+URL 将不可用)。
 
 .. note::
-   The `Amazon::S3`_ module does not have a way to generate download
-   URLs, so we're going to be using another module instead. Unfortunately,
-   most modules for generating these URLs assume that you are using Amazon,
-   so we've had to go with using a more obscure module, `Muck::FS::S3`_. This
-   should be the same as Amazon's sample S3 perl module, but this sample
-   module is not in CPAN. So, you can either use CPAN to install
-   `Muck::FS::S3`_, or install Amazon's sample S3 module manually. If you go
-   the manual route, you can remove ``Muck::FS::`` from the example below.
+   `Amazon::S3`_ 模块还不支持生成下载 URL ,所以 \
+   我们要使用另一个模块。不幸的是，大多数生成这些  \ 
+   URL 的模块都假设你使用的是亚马逊，所以我们不得不 \
+   使用一个更模糊的模块 `Muck::FS::S3`_ 。这应该和 \
+   Amazon S3 的 perl 模块的样例一样，但是这个样例模 \
+   块不在CPAN 中。所以，你可以使用CPAN安装 `Muck::FS::S3`_，\
+   或手动安装 Amazon 的 S3模块示例。如果你遵循手册的 \
+   路线，你可以在下面的示例中删除 ``Muck::FS::``。
 
 .. code-block:: perl
 
@@ -180,7 +180,7 @@ URL will stop working).
 	my $plans_url = $generator->get($bucket->bucket, 'secret_plans.txt');
 	print $plans_url . "\n";
 
-The output will look something like this::
+输出形式类似下面这样::
 
    http://objects.dreamhost.com:80/my-bucket-name/hello.txt
    http://objects.dreamhost.com:80/my-bucket-name/secret_plans.txt?Signature=XXXXXXXXXXXXXXXXXXXXXXXXXXX&Expires=1316027075&AWSAccessKeyId=XXXXXXXXXXXXXXXXXXX

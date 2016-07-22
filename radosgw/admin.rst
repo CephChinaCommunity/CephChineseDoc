@@ -2,25 +2,25 @@
  管理手册
 ==========
 
-Once you have your Ceph Object Storage service up and running, you may
-administer the service with user management, access controls, quotas 
-and usage tracking among other features.
+一旦你的 Ceph 对象存储服务成功启动并运行, \
+你就可以实现管理服务, 比如用户管理、访问控制、\
+限额和用量跟踪等功能。
 
 
-User Management
-===============
+用户管理
+========
 
-Ceph Object Storage user management refers to users of the Ceph Object Storage
-service (i.e., not the Ceph Object Gateway as a user of the Ceph Storage
-Cluster). You must create a user, access key and secret to enable end users to
-interact with Ceph Object Gateway services.
+Ceph 对象存储用户管理是指 Ceph 对象存储服务的用户(即：这里讲 \
+的并不是 Ceph 对象网关是作为 Ceph 存储集群的一个用户)。你必须 \
+创建一个用户, 生成 access 和 access 秘钥以使得最终用户能够与 \
+Ceph 对象网关服务进行交互。
 
-There are two user types: 
+有两种类型的用户: 
 
-- **User:** The term 'user' reflects a user of the S3 interface.
+- **用户:** '用户' 这个表示这个是使用 S3 接口的一个用户.
 
-- **Subuser:** The term 'subuser' reflects a user of the Swift interface. A subuser
-  is associated to a user .
+- **子用户:**  '子用户' 这个词表示使用的是 Swift 接口的一个用户. 一个子用户 \
+  是和一个用户关联的.
   
 .. ditaa:: +---------+
            |   User  |
@@ -30,22 +30,22 @@ There are two user types:
                 +-----+  Subuser  |
                       +-----------+
 
-You can create, modify, view, suspend and remove users and subusers. In addition
-to user and subuser IDs, you may add a display name and an email address for a
-user.  You can specify a key and secret, or generate a key and secret
-automatically. When generating or specifying keys, note that user IDs correspond
-to an S3 key type and subuser IDs correspond to a swift key type. Swift keys
-also have access levels of ``read``, ``write``, ``readwrite`` and ``full``.
+对于用户和子用户，你可以执行新建、修改、查看、停用和删除操作。除了用户和 \
+子用户的 ID，你还需要给用户添加一个显示名称和邮件地址。你可以手动指定 \
+access 和 secret 密钥， 或者选择自动生成。当你生成或者指定密钥的时候，\
+请注意，用户的 ID 是跟 S3 类型的密钥 关联而子用户的 ID 则是跟 Swift \
+类型的密钥关联。Swift 密钥也拥有 ``read``, ``write``, ``readwrite`` \
+和 ``full`` 这几种访问级别。
 
 
-Create a User
+新建一个用户
 -------------
 
-To create a user (S3 interface), execute the following::
+执行下面的命令新建一个用户 (S3 接口)::
 
 	radosgw-admin user create --uid={username} --display-name="{display-name}" [--email={email}]
 
-For example:: 
+实例如下:: 
 
   radosgw-admin user create --uid=johndoe --display-name="John Doe" --email=john@example.com
   
@@ -75,32 +75,32 @@ For example::
         "max_objects": -1},
     "temp_url_keys": []}
 
-Creating a user also creates an ``access_key`` and ``secret_key`` entry for use
-with any S3 API-compatible client.  
+新建用户的时候也同时会生成 ``access_key`` 和 ``secret_key`` 入口，以便任何兼容 S3 API \
+的客户端能够使用。
 
-.. important:: Check the key output. Sometimes ``radosgw-admin``
-   generates a JSON escape (``\``) character, and some clients
-   do not know how to handle JSON escape characters. Remedies include 
-   removing the JSON escape character (``\``), encapsulating the string
-   in quotes, regenerating the key and ensuring that it 
-   does not have a JSON escape character or specify the key and secret 
-   manually.
+.. important:: 仔细检查命令输出的密钥。有时 \
+   ``radosgw-admin`` 会生成一个 JSON转义字 \
+   符(``\``),但是有些客户端不道如何处理JSON \
+   转义字符。补救措施包括将JSON转义字符(``\``) \
+   删除，将这些字符串封装在引号内，重新生成密钥 \
+   直到确定没有JSON转义字符存在或手动指定所需的 \
+   密钥。
 
 
-Create a Subuser
+新建一个子用户
 ----------------
 
-To create a subuser (Swift interface) for the user, you must specify the user ID
-(``--uid={username}``), a subuser ID and the access level for the subuser. ::
+为了给用户新建一个子用户 (Swift 接口) ，你必须为该子用户指定用户的 \
+ID(``--uid={username}``)，子用户的 ID 以及访问级别::
 
   radosgw-admin subuser create --uid={uid} --subuser={uid} --access=[ read | write | readwrite | full ]
 
-For example::
+实例如下::
 
   radosgw-admin subuser create --uid=johndoe --subuser=johndoe:swift --access=full
 
 
-.. note:: ``full`` is not ``readwrite``, as it also includes the access control policy.
+.. note:: ``full`` 并不表示 ``readwrite``, 因为它还包括访问权限策略.
 
 .. code-block:: javascript
 
@@ -131,88 +131,88 @@ For example::
     "temp_url_keys": []}
 
 
-Get User Info
+获取用户信息
 -------------
 
-To get information about a user, you must specify ``user info`` and the user ID
-(``--uid={username}``) . :: 
+要获取一个用户的信息，你必须使用 ``user info`` 子命令并且制定一个用户 \
+ID(``--uid={username}``) . :: 
 
 	radosgw-admin user info --uid=johndoe
 
 
 
-Modify User Info
+修改用户信息
 ----------------
 
-To modify information about a user, you must specify the user ID (``--uid={username}``)
-and the attributes you want to modify. Typical modifications are to keys and secrets,
-email addresses, display names and access levels. For example:: 
+要修改一个用户的信息，你必须指定用户的 ID (``--uid={username}``)，还有 \
+你想要修改的属性值。典型的修改项主要是 access 和secret 密钥，邮件地址，显 \
+示名称和访问级别。举例如下:: 
 
 	radosgw-admin user modify --uid=johndoe --display-name="John E. Doe"
 
-To modify subuser values, specify ``subuser modify`` and the subuser ID. For example::
+要修改子用户的信息, 使用 ``subuser modify`` 子命令并且执行子用户的 ID. 举例如下::
 
 	radosgw-admin subuser modify --uid=johndoe:swift --access=full
 
 
-User Enable/Suspend
+用户 启用/停用
 -------------------
 
-When you create a user, the user is enabled by default. However, you may suspend
-user  privileges and re-enable them at a later time. To suspend a user, specify
-``user suspend`` and the user ID. ::
+当你创建了一个用户，用户默认情况下是处于启用状态的。然而，你可以暂停用户权 \
+限并在以后随时重新启用它们。暂停一个用户，使用 ``user suspend``  子命令 \
+然后哦指定用户的 ID::
 
 	radosgw-admin user suspend --uid=johndoe
 
-To re-enable a suspended user, specify ``user enable`` and the user ID. :: 
+要重新启用已经被停用的用户，使用 ``user enable`` 子命令并指明用户的 ID. :: 
 
 	radosgw-admin user enable --uid=johndoe
 
-.. note:: Disabling the user disables the subuser.
+.. note:: 停用一个用户后，它的子用户也会一起被停用.
 
 
 删除用户
 --------
 
 删除用户时，这个用户以及他的子用户都会被删除。当然，如果你愿意，\
-可以只删除子用户。要删除用户（及其子用户），可指定 ``user rm`` \
-和用户 ID ： ::
+可以只删除子用户。要删除用户（及其子用户），可使用 ``user rm`` \
+子命令并指明用户 ID ： ::
 
 	radosgw-admin user rm --uid=johndoe
 
-只想删除子用户时，可指定 ``subuser rm`` 和子用户 ID 。 ::
+只想删除子用户时，可使用 ``subuser rm`` 子命令并指明子用户 ID 。 ::
 
 	radosgw-admin subuser rm --subuser=johndoe:swift
 
 其它可选操作：
 
-- **清除数据：** 加 ``--purge-data`` 选项可清除与此 UID 相关的所有\
+- **Purge Data:** 加 ``--purge-data`` 选项可清除与此 UID 相关的所有\
   数据。
   
-- **清除密钥：** 加 ``--purge-keys`` 选项可清除与此 UID 相关的所有\
+- **Purge Keys:** 加 ``--purge-keys`` 选项可清除与此 UID 相关的所有\
   密钥。
 
 
 删除子用户
 ----------
 
-你删除子用户的同时，也失去了 Swift 接口的访问方式，但是这个用户还\
-在系统中存在。要删除子用户，可指定 ``subuser rm`` 及子用户 ID ： ::
+在你删除子用户的同时，也失去了 Swift 接口的访问方式，但是这个用户在系统 \
+中还存在。要删除子用户，可使用 ``subuser rm`` 子命令并指明子用户 ID ： ::
 
 	radosgw-admin subuser rm --subuser=johndoe:swift
 
 其它可选操作：
 
-- **清除密钥：** 加 ``--purge-keys`` 选项可清除与此 UID 相关的所有\
+- **Purge Keys:** 加 ``--purge-keys`` 选项可清除与此 UID 相关的所有\
   密钥。
 
 
-Create a Key
+新建一个密钥
 ------------
 
-To create a key for a user, you must specify ``key create``. For a user, specify
-the user ID and the ``s3`` key type. To create a key for subuser, you must
-specify the subuser ID and the ``swift`` keytype. For example::
+要为用户新建一个密钥，你需要使用 ``key create`` 子命令。对于用户来说，\
+需要指明用户的 ID 以及新建的密钥类型为 ``s3`` 。要为子用户新建一个密钥，\
+则需要指明子用户的 ID以及密钥类型为 ``swift`` 。实例如下::
 
 	radosgw-admin key create --subuser=johndoe:swift --key-type=swift --gen-secret
 
@@ -236,58 +236,58 @@ specify the subuser ID and the ``swift`` keytype. For example::
 
 
 
-Add / Remove Access Keys
+新建/删除 Access 密钥
 ------------------------
 
-Users and subusers must have access keys to use the S3 and Swift
-interfaces. When you create a user or subuser and you do not specify 
-an access key and secret, the key and secret get generated automatically. 
-You may create a key and either specify or generate the access key and/or
-secret. You may also remove an access key and secret. Options include:
+用户和子用户要能使用 S3 和Swift 接口，必须有 access 密钥。在你新 \
+建用户或者子用户的时候，如果没有指明 access 和 secret 密钥，这两 \
+个密钥会自动生成。你可能需要新建 access 和/或 secret 密钥，不管是 \
+手动指定还是自动生成的方式。你也可能需要删除一个 access 和 secret 。\
+可用的选项有：
 
 
-- ``--secret=<key>`` specifies a secret key (e.g,. manually generated).
-- ``--gen-access-key`` generates random access key (for S3 user by default).
-- ``--gen-secret`` generates a random secret key.
-- ``--key-type=<type>`` specifies a key type. The options are: swift, s3
+- ``--secret=<key>`` 指明一个 secret 密钥 (e.即手动生成).
+- ``--gen-access-key`` 生成一个随机的 access 密钥 (新建 S3 用户的默认选项).
+- ``--gen-secret`` 生成一个随机的 secret 密钥.
+- ``--key-type=<type>`` 指定密钥类型. 这个选项的值可以是: swift, s3
 
 
-To add a key, specify the user. ::
+要新建密钥，需要指明用户 ID. ::
 
 	radosgw-admin key create --uid=johndoe --key-type=s3 --gen-access-key --gen-secret
 
-You may also specify a key and a secret.
+你也可以使用指定 access 和 secret 密钥的方式.
 
-To remove an access key, specify the user. :: 
+要删除一个 access 密钥, 也需要指定用户 ID. :: 
 
 	radosgw-admin key rm --uid=johndoe
 
 
 
-Add / Remove Admin Capabilities
+添加/删除 管理权限
 -------------------------------
 
-The Ceph Storage Cluster provides an administrative API that enables  users to
-execute administrative functions via the REST API. By default, users do NOT have
-access to this API. To enable a user to exercise  administrative functionality,
-provide the user with administrative capabilities.
+Ceph 存储集群提供了一个管理API，它允许用户通过 \
+REST API 执行管理功能。默认情况下，用户没有访问 \
+这个 API 的权限。要启用用户的管理功能，需要为用 \
+户提供管理权限。
 
-To add administrative capabilities to a user, execute the following:: 
+执行下面的命令为一个用户添加管理权限:: 
 
 	radosgw-admin caps add --uid={uid} --caps={caps}
 
 
-You can add read, write or all capabilities to users, buckets, metadata and 
-usage (utilization). For example::
+你可以给一个用户添加对用户、bucket、元数据和用量(存储使用信息)等数据的 \
+读、写或者所有权限。举例如下::
 
 	--caps="[users|buckets|metadata|usage|zone]=[*|read|write|read, write]"
 
-For example::
+实例如下::
 
 	radosgw-admin caps add --uid=johndoe --caps="users=*"
 
 
-要删除某用户的管理能力，可用下面的命令： ::
+要删除某用户的管理权限，可用下面的命令： ::
 
 	radosgw-admin caps rm --uid=johndoe --caps={caps}
 
@@ -295,167 +295,167 @@ For example::
 配额管理
 ========
 
-The Ceph Object Gateway enables you to set quotas on users and buckets owned by
-users. Quotas include the maximum number of objects in a bucket and the maximum
-storage size in megabytes.
+Ceph对象网关允许你在用户级别、用户拥有的 bucket 级别设置配额。\
+配额包括一个 bucket 内允许的最大对象数和最大存储容量，大小单位 \
+是兆字节。
 
-- **Bucket:** The ``--bucket`` option allows you to specify a quota for
-  buckets the user owns.
+- **Bucket:** 选项 ``--bucket`` 允许你为用户的某一个 \
+  bucket 设置配额。
 
-- **Maximum Objects:** The ``--max-objects`` setting allows you to specify
-  the maximum number of objects. A negative value disables this setting.
+- **Maximum Objects:**  选项 ``--max-objects`` 允许 \
+  你设置最大对象数。负数表示不启用这个设置。
   
-- **Maximum Size:** The ``--max-size`` option allows you to specify a quota
-  for the maximum number of bytes. A negative value disables this setting.
+- **Maximum Size:** 选项 ``--max-size`` 允许你设置一个 \
+  最大存储用量的配额。负数表示不启用这个设置。
   
-- **Quota Scope:** The ``--quota-scope`` option sets the scope for the quota.
-  The options are ``bucket`` and ``user``. Bucket quotas apply to buckets a 
-  user owns. User quotas apply to a user.
+- **Quota Scope:** 选项 ``--quota-scope`` 表示这个配额 \
+  生效的范围。这个参数的值是 ``bucket`` 和 ``user``. Bucket \
+  配额作用于用户的某一个 bucket。而用户配额作用于一个用户。
 
 
-Set User Quota
+设置用户配额
 --------------
 
-Before you enable a quota, you must first set the quota parameters.
-For example:: 
+在你启用用户的配额前 ，你需要先设置配额参数。
+例如:: 
 
 	radosgw-admin quota set --quota-scope=user --uid=<uid> [--max-objects=<num objects>] [--max-size=<max size>]
 
-For example:: 
+实例如下:: 
 
 	radosgw-admin quota set --quota-scope=user --uid=johndoe --max-objects=1024 --max-size=1024
 
 
-A negative value for num objects and / or max size means that the
-specific quota attribute check is disabled.
+最大对象数和最大存储用量的值是负数则表示不启用指定的 \
+配额参数。
 
 
-Enable/Disable User Quota
+启用/禁用用户配额
 -------------------------
 
-Once you set a user quota, you may enable it. For example:: 
+在你设置了用户配额之后，你可以启用这个配额。实例如下:: 
 
 	radosgw-admin quota enable --quota-scope=user --uid=<uid>
 
-You may disable an enabled user quota. For example:: 
+你也可以禁用已经启用了配额的用户的配额。 举例如下:: 
 
 	radosgw-admin quota-disable --quota-scope=user --uid=<uid>
 
 
-Set Bucket Quota
+设置 Bucket 配额
 ----------------
 
-Bucket quotas apply to the buckets owned by the specified ``uid``. They are
-independent of the user. ::
+Bucket 配额作用于用户的某一个 bucket，通过 ``uid`` 指定用户。\
+这些配额设置是独立于用户之外的。::
 
 	radosgw-admin quota set --uid=<uid> --quota-scope=bucket [--max-objects=<num objects>] [--max-size=<max size]
 
-A negative value for num objects and / or max size means that the
-specific quota attribute check is disabled.
+最大对象数和最大存储用量的值是负数则表示不启用指定的 \
+配额参数。
 
 
-Enable/Disable Bucket Quota
+启用/禁用 bucket 配额
 ---------------------------
 
-Once you set a bucket quota, you may enable it. For example:: 
+在你设置了 bucket 配额之后，你可以启用这个配额。实例如下:: 
 
 	radosgw-admin quota enable --quota-scope=bucket --uid=<uid>
 
-You may disable an enabled bucket quota. For example:: 
+你也可以禁用已经启用了配额的 bucket 的配额。 举例如下:: 
 
 	radosgw-admin quota-disable --quota-scope=bucket --uid=<uid>
 
 
-Get Quota Settings
+获取配额信息
 ------------------
 
-You may access each user's quota settings via the user information
-API. To read user quota setting information with the CLI interface, 
-execute the following::
+你可以通过用户信息 API 来获取每一个用户的配额 \
+设置。通过 CLI 接口读取用户的配额设置信息，请 \
+执行下面的命令::
 
 	radosgw-admin user info --uid=<uid>
 
 
-Update Quota Stats
+更新配额统计信息
 ------------------
 
-Quota stats get updated asynchronously. You can update quota
-statistics for all users and all buckets manually to retrieve
-the latest quota stats. ::
+配额的统计数据的同步是异步的。你也可以通过手动获 \
+取最新的配额统计数据为所有用户和所有 bucket 更 \
+新配额统计数据::
 
 	radosgw-admin user stats --uid=<uid> --sync-stats
 
 
-Get User Usage Stats
+获取用户用量统计信息
 --------------------
 
-To see how much of the quota a user has consumed, execute the following::
+执行下面的命令获取当前用户已经消耗了配额的多少::
 
 	radosgw-admin user stats --uid=<uid>
 
-.. note:: You should execute ``radosgw-admin user stats`` with the 
-   ``--sync-stats`` option to receive the latest data.
+.. note:: 你应该在执行 ``radosgw-admin user stats`` 的时候带上 
+   ``--sync-stats`` 参数来获取最新的数据.
 
 
-Reading / Writing Global Quotas
+读取/设置全局配额
 -------------------------------
 
-You can read and write quota settings in a region map. To get a
-region map, execute the following. :: 
+你可以在 region map中读取和设置配额。执行下面的命 \
+令来获取 region map:: 
 
 	radosgw-admin regionmap get > regionmap.json
 
-To set quota settings for the entire region, simply modify the 
-quota settings in the region map. Then, use ``region set`` to 
-update the region map. ::
+要为整个 region 设置配额，只需要简单的修改 \
+region map 中的配额设置。然后使用 ``region set`` \
+来更新 region map即可::
 
 	radosgw-admin region set < regionmap.json
 
-.. note:: After updating the region map, you must restart the gateway.
+.. note:: 在更新 region map 后，你必须重启网关.
 
 
-Usage
+用量
 =====
 
-The Ceph Object Gateway logs usage for each user. You can track
-user usage within date ranges too.
+Ceph 对象网关会为每一个用户记录用量数据。你也可以通过指定 \
+日期范围来跟踪用户的用量数据。
 
-Options include: 
+可用选项如下: 
 
-- **Start Date:** The ``--start-date`` option allows you to filter usage
-  stats from a particular start date (**format:** ``yyyy-mm-dd[HH:MM:SS]``).
+- **Start Date:** 选项 ``--start-date`` 允许你指定一个起始\
+  日期来过滤用量数据 (**format:** ``yyyy-mm-dd[HH:MM:SS]``).
 
-- **End Date:** The ``--end-date`` option allows you to filter usage up
-  to a particular date (**format:** ``yyyy-mm-dd[HH:MM:SS]``). 
+- **End Date:** 选项 ``--end-date`` 允许你指定一个截止\
+  日期来过滤用量数据 (**format:** ``yyyy-mm-dd[HH:MM:SS]``).
   
-- **Log Entries:** The ``--show-log-entries`` option allows you to specify
-  whether or not to include log entries with the usage stats 
-  (options: ``true`` | ``false``).
+- **Log Entries:** 选项 ``--show-log-entries`` 允许你 \
+  指明显示用量数据的时候是否要包含日志条目。
+  (选项值: ``true`` | ``false``).
 
-.. note:: You may specify time with minutes and seconds, but it is stored 
-   with 1 hour resolution.
+.. note:: 你可以指定时间为分钟和秒，但是数据存储是以一个小时 \
+的间隔存储的.
 
 
-Show Usage
-----------
+展示用量信息
+--------------
 
-To show usage statistics, specify the ``usage show``. To show usage for a
-particular user, you must specify a user ID. You may also specify a start date,
-end date, and whether or not to show log entries.::
+显示用量统计数据，使用 ``usage show`` 子命令。显示某一个特定 \
+用户的用量数据，你必须指定该用户的 ID。你也可以指定开始日期、结 \
+束日期以及是否显示日志条目。::
 
 	radosgw-admin usage show --uid=johndoe --start-date=2012-03-01 --end-date=2012-04-01
 
-You may also show a summary of usage information for all users by omitting a user ID. ::
+通过去掉用户的 ID，你也可以获取所有用户的汇总的用量信息 ::
 
 	radosgw-admin usage show --show-log-entries=false
 
 
-Trim Usage
-----------
+删除用量信息
+--------------
 
-With heavy use, usage logs can begin to take up storage space. You can trim
-usage logs for all users and for specific users. You may also specify date
-ranges for trim operations. ::
+对于大量使用的集群而言，用量日志可能会占用大量存储空间。你 \
+可以为所有用户或者一个特定的用户删除部分用量日志。你也可以 \
+为删除操作指定日期范围。::
 
 	radosgw-admin usage trim --start-date=2010-01-01 --end-date=2010-12-31
 	radosgw-admin usage trim --uid=johndoe

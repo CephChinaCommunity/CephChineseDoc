@@ -1,12 +1,12 @@
-Service Operations
+服务操作
 ==================
 
-List Buckets
+列出 bucket
 ------------
-``GET /`` returns a list of buckets created by the user making the request. ``GET /`` only
-returns buckets created by an authenticated user. You cannot make an anonymous request.
+``GET /`` 会返回执行该操作的用户的 bucket 列表。``GET /`` 只返回由经过认证的用户\
+新建的 buckets。你不同提交一个匿名请求。
 
-Syntax
+语法
 ~~~~~~
 ::
 
@@ -15,7 +15,7 @@ Syntax
 
 	Authorization: AWS {access-key}:{hash-of-header-and-secret}
 
-Response Entities
+请求返回值
 ~~~~~~~~~~~~~~~~~
 
 +----------------------------+-------------+-----------------------------------------------------------------+

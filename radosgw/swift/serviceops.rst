@@ -1,19 +1,19 @@
 ====================
- Service Operations
+ 服务操作
 ====================
 
-To retrieve data about our Swift-compatible service, you may execute ``GET`` 
-requests using the ``X-Storage-Url`` value retrieved during authentication. 
+要从我们的兼容 Swift 的服务中获取数据，你可以执行 ``GET`` \
+请求，在身份验证期间使用 ``X-Storage-Url`` 的值来获取。
 
-List Containers
+列出所有容器
 ===============
 
-A ``GET`` request that specifies the API version and the account will return
-a list of containers for a particular user account. Since the request returns
-a particular user's containers, the request requires an authentication token.
-The request cannot be made anonymously.
+一个指定API版本和帐户的 ``GET`` 请求将返回特定 \
+用户帐户的容器列表。因为这个请求返回一个特定用户 \
+的容器，所以该请求需要一个身份验证令牌。这种请求 \
+不能匿名。
 
-Syntax
+语法
 ~~~~~~
 
 ::
@@ -24,53 +24,53 @@ Syntax
 
 
 
-Request Parameters
+请求参数
 ~~~~~~~~~~~~~~~~~~
 
 ``limit``
 
-:Description: Limits the number of results to the specified value.
-:Type: Integer
-:Required: No
+:描述: 限制特定值的结果的数目
+:类型: Integer
+:是否必需: No
 
 ``format``
 
-:Description: Defines the format of the result. 
-:Type: String
-:Valid Values: ``json`` | ``xml``
-:Required: No
+:描述: 定义结果的格式 
+:类型: String
+:有效值: ``json`` | ``xml``
+:是否必需: No
 
 
 ``marker``
 
-:Description: Returns a list of results greater than the marker value.
-:Type: String
-:Required: No
+:描述: 返回大于 marker 值的结果的列表
+:类型: String
+:是否必需: No
 
 
 
-Response Entities
+响应实体
 ~~~~~~~~~~~~~~~~~
 
-The response contains a list of containers, or returns with an HTTP
-204 response code
+响应包含容器列表，或者返回一个 204 HTTP \
+响应代码。
 
 ``account``
 
-:Description: A list for account information.
-:Type: Container
+:描述: 账户信息的列表
+:类型: Container
 
 ``container``
 
-:Description: The list of containers.
-:Type: Container
+:描述: 容器列表
+:类型: Container
 
 ``name``
 
-:Description: The name of a container.
-:Type: String
+:描述: 容器名
+:类型: String
 
 ``bytes``
 
-:Description: The size of the container.
-:Type: Integer
+:描述: 容器空间大小
+:类型: Integer

@@ -1,12 +1,12 @@
 .. _python:
 
-Python S3 Examples
+Python S3 样例
 ==================
 
-Creating a Connection
+新建一个连接
 ---------------------
 
-This creates a connection so that you can interact with the server.
+下面的代码会新建一个连接，这样你就可以和服务器交互.
 
 .. code-block:: python
 
@@ -24,11 +24,11 @@ This creates a connection so that you can interact with the server.
 		)
 
 
-Listing Owned Buckets
+列出用户的所有 bucket
 ---------------------
 
-This gets a list of Buckets that you own.
-This also prints out the bucket name and creation date of each bucket.
+下面的代码会列出你的 bucket 的列表。
+这也会打印出每个bucket的 bucket 名和创建时间。
 
 .. code-block:: python
 
@@ -38,29 +38,29 @@ This also prints out the bucket name and creation date of each bucket.
 			created = bucket.creation_date,
 		)
 
-The output will look something like this::
+输出形式类似下面这样::
 
    mahbuckat1	2011-04-21T18:05:39.000Z
    mahbuckat2	2011-04-21T18:05:48.000Z
    mahbuckat3	2011-04-21T18:07:18.000Z
 
 
-Creating a Bucket
+新建一个 Bucket
 -----------------
 
-This creates a new bucket called ``my-new-bucket``
+下面的代码会新建一个名为 ``my-new-bucket`` 的bucket。
 
 .. code-block:: python
 
 	bucket = conn.create_bucket('my-new-bucket')
 
 
-Listing a Bucket's Content
+列出 bucket 的内容
 --------------------------
 
-This gets a list of objects in the bucket.
-This also prints out each object's name, the file size, and last
-modified date.
+下面的代码会输出 bucket 内的所有对象列表。
+这也会打印出每一个对象的名字、文件尺寸和\
+最近修改时间。
 
 .. code-block:: python
 
@@ -71,36 +71,36 @@ modified date.
 			modified = key.last_modified,
 			)
 
-The output will look something like this::
+输出形式类似下面这样::
 
    myphoto1.jpg	251262	2011-08-08T21:35:48.000Z
    myphoto2.jpg	262518	2011-08-08T21:38:01.000Z
 
 
-Deleting a Bucket
+删除 Bucket
 -----------------
 
 .. note::
 
-   The Bucket must be empty! Otherwise it won't work!
+   Bucket必须为空！否则它不会工作!
 
 .. code-block:: python
 
 	conn.delete_bucket(bucket.name)
 
 
-Forced Delete for Non-empty Buckets
+强制删除非空 Buckets
 -----------------------------------
 
 .. attention::
 
-   not available in python
+   不支持
 
 
-Creating an Object
+新建一个对象
 ------------------
 
-This creates a file ``hello.txt`` with the string ``"Hello World!"``
+下面的代码会新建一个内容是字符串``"Hello World!"`` 的文件 ``hello.txt``。
 
 .. code-block:: python
 
@@ -108,11 +108,11 @@ This creates a file ``hello.txt`` with the string ``"Hello World!"``
 	key.set_contents_from_string('Hello World!')
 
 
-Change an Object's ACL
+修改一个对象的 ACL
 ----------------------
 
-This makes the object ``hello.txt`` to be publicly readable, and
-``secret_plans.txt`` to be private.
+下面的代码会将对象 ``hello.txt`` 的权限变为公开可读，而将
+``secret_plans.txt`` 的权限设为私有。
 
 .. code-block:: python
 
@@ -122,11 +122,11 @@ This makes the object ``hello.txt`` to be publicly readable, and
 	plans_key.set_canned_acl('private')
 
 
-Download an Object (to a file)
+下载一个对象 (到文件)
 ------------------------------
 
-This downloads the object ``perl_poetry.pdf`` and saves it in
-``/home/larry/documents/``
+下面的代码会下载对象 ``perl_poetry.pdf`` 并将它存到位置
+``C:\Users\larry\Documents``
 
 .. code-block:: python
 
@@ -134,25 +134,25 @@ This downloads the object ``perl_poetry.pdf`` and saves it in
 	key.get_contents_to_filename('/home/larry/documents/perl_poetry.pdf')
 
 
-Delete an Object
+删除一个对象
 ----------------
 
-This deletes the object ``goodbye.txt``
+下面的代码会删除对象 ``goodbye.txt``
 
 .. code-block:: python
 
 	bucket.delete_key('goodbye.txt')
 
 
-Generate Object Download URLs (signed and unsigned)
+生成对象的下载 URLs (带签名和不带签名)
 ---------------------------------------------------
 
-This generates an unsigned download URL for ``hello.txt``. This works
-because we made ``hello.txt`` public by setting the ACL above.
-This then generates a signed download URL for ``secret_plans.txt`` that
-will work for 1 hour. Signed download URLs will work for the time
-period even if the object is private (when the time period is up, the
-URL will stop working).
+下面的代码会为 ``hello.txt`` 生成一个无签名为下载URL。 \
+这个操作是生效是因为前面我们已经设置 ``hello.txt`` 的 \
+ACL 为公开可读。下面的代码同时会为 ``secret_plans.txt`` \
+生成一个有效时间是一个小时的带签名的下载 URL。带签名的下载 \
+URL 在这个时间内是可用的，即使对象的权限是私有(当时间到期后 \
+URL 将不可用)。
 
 .. code-block:: python
 
@@ -164,7 +164,7 @@ URL will stop working).
 	plans_url = plans_key.generate_url(3600, query_auth=True, force_http=True)
 	print plans_url
 
-The output of this will look something like::
+输出形式类似下面这样::
 
    http://objects.dreamhost.com/my-bucket-name/hello.txt
    http://objects.dreamhost.com/my-bucket-name/secret_plans.txt?Signature=XXXXXXXXXXXXXXXXXXXXXXXXXXX&Expires=1316027075&AWSAccessKeyId=XXXXXXXXXXXXXXXXXXX

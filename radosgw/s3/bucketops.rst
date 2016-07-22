@@ -1,22 +1,21 @@
-========
- 桶操作
-========
+============
+ bucket 操作
+============
 
 PUT Bucket
-----------
+-----------
+创建一个新的 bucket。要创建一个 bucket，你必须有一个用户 ID 和一个有效的 AWS \
+访问密钥 ID 来进行身份验证请求。匿名用户不能创建 bucket。
 
-Creates a new bucket. To create a bucket, you must have a user ID and a valid AWS Access Key ID to authenticate requests. You may not
-create buckets as an anonymous user.
+.. note:: 当前版本我们不支持通过 ``PUT /{bucket}`` 来请求实例。
 
-.. note:: We do not support request entities for ``PUT /{bucket}`` in this release.
-
-Constraints
+约束条件
 ~~~~~~~~~~~
-In general, bucket names should follow domain name constraints.
+一般而言，bucket 名称应该遵循下述域名命名约束条件
 
-- Bucket names must be unique.
-- Bucket names must begin and end with a lowercase letter.
-- Bucket names may contain a dash (-).
+- Bucket 名必须是唯一的
+- Bucket 名必须以小写字母开始和结尾
+- Bucket 名可以包含破折号 (-).
 
 语法
 ~~~~
@@ -39,12 +38,13 @@ In general, bucket names should follow domain name constraints.
 +---------------+----------------------+-----------------------------------------------------------------------------+------------+
 
 
+
 HTTP 响应
 ~~~~~~~~~
 
-If the bucket name is unique, within constraints and unused, the operation will succeed.
-If a bucket with the same name already exists and the user is the bucket owner, the operation will succeed.
-If the bucket name is already in use, the operation will fail.
+如果 bucket 的名称是独一无二的，满足约束条件并且没有被使用，操作就会成功的。
+如果已经存在同名的 bucket，并且 bucket 的所有者就是当前请求用户，操作也会返回成功的。
+如果 bucket 名称已经被使用，操作将会返回失败。
 
 +---------------+-----------------------+----------------------------------------------------------+
 | HTTP Status   | Status Code           | Description                                              |
@@ -52,12 +52,12 @@ If the bucket name is already in use, the operation will fail.
 | ``409``       | BucketAlreadyExists   | Bucket already exists under different user's ownership.  |
 +---------------+-----------------------+----------------------------------------------------------+
 
-DELETE Bucket
+删除 Bucket
 -------------
 
-Deletes a bucket. You can reuse bucket names following a successful bucket removal.
+删除一个 bucket，得到成功删除 bucket 的返回信息后就可以重用该 bucket 名。
 
-Syntax
+语法
 ~~~~~~
 
 ::
@@ -67,7 +67,7 @@ Syntax
 
     Authorization: AWS {access-key}:{hash-of-header-and-secret}
 
-HTTP Response
+HTTP 响应
 ~~~~~~~~~~~~~
 
 +---------------+---------------+------------------+
@@ -76,11 +76,11 @@ HTTP Response
 | ``204``       | No Content    | Bucket removed.  |
 +---------------+---------------+------------------+
 
-GET Bucket
-----------
-Returns a list of bucket objects.
+获取 Bucket
+-----------
+返回 bucket 中的对象列表
 
-Syntax
+语法
 ~~~~~~
 
 ::
@@ -88,7 +88,7 @@ Syntax
     GET /{bucket}?max-keys=25 HTTP/1.1
     Host: cname.domain.com
 
-Parameters
+参数
 ~~~~~~~~~~
 
 +-----------------+-----------+-----------------------------------------------------------------------+
@@ -104,7 +104,7 @@ Parameters
 +-----------------+-----------+-----------------------------------------------------------------------+
 
 
-HTTP Response
+HTTP 响应
 ~~~~~~~~~~~~~
 
 +---------------+---------------+--------------------+
@@ -113,9 +113,9 @@ HTTP Response
 | ``200``       | OK            | Buckets retrieved  |
 +---------------+---------------+--------------------+
 
-Bucket Response Entities
+Bucket 响应实例
 ~~~~~~~~~~~~~~~~~~~~~~~~
-``GET /{bucket}`` returns a container for buckets with the following fields.
+``GET /{bucket}`` 返回一个容器，包含 bucket 的下列字段
 
 +------------------------+-----------+----------------------------------------------------------------------------------+
 | Name                   | Type      | Description                                                                      |
@@ -137,9 +137,9 @@ Bucket Response Entities
 | ``CommonPrefixes``     | Container | If multiple objects contain the same prefix, they will appear in this list.      |
 +------------------------+-----------+----------------------------------------------------------------------------------+
 
-Object Response Entities
+对象响应实例
 ~~~~~~~~~~~~~~~~~~~~~~~~
-The ``ListBucketResult`` contains objects, where each object is within a ``Contents`` container.
+``ListBucketResult`` 包含很多对象，每个对象都包含一个 ``Contents`` 容器.
 
 +------------------------+-----------+------------------------------------------+
 | Name                   | Type      | Description                              |
@@ -157,16 +157,15 @@ The ``ListBucketResult`` contains objects, where each object is within a ``Conte
 | ``StorageClass``       | String    | Should always return ``STANDARD``.       |
 +------------------------+-----------+------------------------------------------+
 
-
-Get Bucket Location
+获取 Bucket 位置
 -------------------
-Retrieves the bucket's region. The user needs to be the bucket owner
-to call this. A bucket can be constrained to a region by providing
-``LocationConstraint`` during a PUT request.
+获取 bucket 的 region。只有 bucket 的所有者才能发起这个请求。一个 \
+bucket 可以在发起 PUT 请求的时候通过指定 ``LocationConstraint`` \
+参数来限制它的 region。
 
-Syntax
+语法
 ~~~~~~
-Add the ``location`` subresource to bucket resource as shown below
+如下所示在 bucket 资源后面添加 ``location`` 子资源
 
 ::
 
@@ -175,7 +174,7 @@ Add the ``location`` subresource to bucket resource as shown below
 
    Authorization: AWS {access-key}:{hash-of-header-and-secret}
 
-Response Entities
+响应实例
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 +------------------------+-----------+------------------------------------------+
@@ -186,14 +185,15 @@ Response Entities
 +------------------------+-----------+------------------------------------------+
 
 
-Get Bucket ACL
---------------
-Retrieves the bucket access control list. The user needs to be the bucket
-owner or to have been granted ``READ_ACP`` permission on the bucket.
 
-Syntax
+获取 Bucket ACL
+----------------
+获取 bucket 的访问控制列表。请求用户需要是该 bucket 的所有者或者已经针对\
+这个 bucket 授权了 ``READ_ACP`` 权限的用户.
+
+语法
 ~~~~~~
-Add the ``acl`` subresource to the bucket request as shown below.
+如下所示，在 bucket 请求后面添加 ``acl`` 子资源.
 
 ::
 
@@ -202,7 +202,7 @@ Add the ``acl`` subresource to the bucket request as shown below.
 
     Authorization: AWS {access-key}:{hash-of-header-and-secret}
 
-Response Entities
+响应实例
 ~~~~~~~~~~~~~~~~~
 
 +---------------------------+-------------+----------------------------------------------------------------------------------------------+
@@ -225,20 +225,20 @@ Response Entities
 | ``Permission``            | String      | The permission given to the ``Grantee`` bucket.                                              |
 +---------------------------+-------------+----------------------------------------------------------------------------------------------+
 
-PUT Bucket ACL
---------------
-Sets an access control to an existing bucket. The user needs to be the bucket
-owner or to have been granted ``WRITE_ACP`` permission on the bucket.
+设置 Bucket ACL
+----------------
+为一个已经存在的 bucket 设置一个访问控制。请求用户需要是该 bucket 的所有者或者已经针对 \
+这个 bucket 授权了 ``WRITE_ACP`` 权限的用户.
 
-Syntax
+语法
 ~~~~~~
-Add the ``acl`` subresource to the bucket request as shown below.
+如下所示，在 bucket 请求后面添加 ``acl`` 子资源.
 
 ::
 
     PUT /{bucket}?acl HTTP/1.1
 
-Request Entities
+响应实例
 ~~~~~~~~~~~~~~~~
 
 +---------------------------+-------------+----------------------------------------------------------------------------------------------+
@@ -261,23 +261,23 @@ Request Entities
 | ``Permission``            | String      | The permission given to the ``Grantee`` bucket.                                              |
 +---------------------------+-------------+----------------------------------------------------------------------------------------------+
 
-List Bucket Multipart Uploads
+列出 Bucket 的分块上传
 -----------------------------
 
-``GET /?uploads`` returns a list of the current in-progress multipart uploads--i.e., the application initiates a multipart upload, but
-the service hasn't completed all the uploads yet.
+``GET /?uploads`` 返回当前正在进行中的分块上传的列表。比如：应用 \
+程序启动了一个分块上传，但是服务尚未完成所有块的上传。
 
-Syntax
+语法
 ~~~~~~
 
 ::
 
     GET /{bucket}?uploads HTTP/1.1
 
-Parameters
+参数
 ~~~~~~~~~~
 
-You may specify parameters for ``GET /{bucket}?uploads``, but none of them are required.
+你可以为 ``GET /{bucket}?uploads`` 指定一些参数，但下面这些参数都不是必须的.
 
 +------------------------+-----------+--------------------------------------------------------------------------------------+
 | Name                   | Type      | Description                                                                          |
@@ -297,7 +297,7 @@ You may specify parameters for ``GET /{bucket}?uploads``, but none of them are r
 +------------------------+-----------+--------------------------------------------------------------------------------------+
 
 
-Response Entities
+响应实例
 ~~~~~~~~~~~~~~~~~
 
 +-----------------------------------------+-------------+----------------------------------------------------------------------------------------------------------+
@@ -346,22 +346,17 @@ Response Entities
 | ``CommonPrefixes.Prefix``               | String      | The substring of the key after the prefix as defined by the ``prefix`` request parameter.                |
 +-----------------------------------------+-------------+----------------------------------------------------------------------------------------------------------+
 
-ENABLE/SUSPEND BUCKET VERSIONING
+启用/禁用 BUCKET 版本
 --------------------------------
 
-``PUT /?versioning`` 这个子资源用于设置已有桶的版本化状态。只有桶\
-所有者才能设置版本化状态。
+``PUT /?versioning`` 这个子资源用于设置已有 bucket 的版本化状态。只有 bucket 所有者才能设置这个版本状态。
 
-版本化状态可以设置为如下取值之一：
+版本状态可以设置为如下取值之一：
 
-- Enabled : 为桶内的对象启用版本化支持，放入桶内的对象都会收到一个\
-  唯一的版本 ID 。
-- Suspended : 为桶内的对象禁用版本化支持，放入桶内的对象其版本 ID \
-  都是 null 。
+- Enabled : 为 bucket 内的对象启用版本，放入 bucket 内的对象都会收到一个唯一的版本 ID 。
+- Suspended : 为 bucket 内的对象禁用版本，放入 bucket 内的对象其版本 ID 都是 null 。
 
-如果从没给某一个桶设置过版本化状态，那它就没有版本化状态； \
-GET versioning 请求就不会返回版本化状态值。
-
+如果从没给某一个 bucket 设置过版本状态，那它就没有版本状态；获取版本的 GET 请求就不会返回版本的状态值。
 
 语法
 ~~~~
@@ -370,14 +365,13 @@ GET versioning 请求就不会返回版本化状态值。
 
 	PUT  /{bucket}?versioning  HTTP/1.1
 
-
 请求实体
 ~~~~~~~~
 
-+-----------------------------+-----------+------------------------------------------------+
-| 名称                        | 类型      | 描述                                           |
-+=============================+===========+================================================+
-| ``VersioningConfiguration`` | Container | 用于包装此请求的容器。                         |
-+-----------------------------+-----------+------------------------------------------------+
-| ``Status``                  | String    | 设置桶的版本化状态，可用值： Suspended/Enabled |
-+-----------------------------+-----------+------------------------------------------------+
++-----------------------------+-----------+---------------------------------------------------------------------------+
+| Name                        | Type      | Description                                                               |
++=============================+===========+===========================================================================+
+| ``VersioningConfiguration`` | Container | A container for the request.                                              |
++-----------------------------+-----------+---------------------------------------------------------------------------+
+| ``Status``                  | String    | Sets the versioning state of the bucket.  Valid Values: Suspended/Enabled |
++-----------------------------+-----------+---------------------------------------------------------------------------+

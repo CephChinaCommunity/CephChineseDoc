@@ -242,7 +242,7 @@ region 的网关配置中指定 ``rgw_override_bucket_index_max_shards`` 。举\
           的 OSD 上也能够提升 bucket 索引的性能。
 
 给 DNS 添加泛域名解析
--------------------
+------------------------
 
 为了通过 S3 风格的子域名来使用 Ceph(如：bucket-name.domain-name.com)，\
 你应该给你的 ``ceph-radosgw`` 守护进程所在服务器在 DNS 服务器上给它的 DNS \
