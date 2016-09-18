@@ -22,8 +22,8 @@
 
 把 Ceph 仓库添加到 ``ceph-deploy`` 管理节点，然后安装 ``ceph-deploy`` 。
 
-高级包管理工具（APT）
----------------------
+Debian / Ubuntu
+---------------
 
 在 Debian 和 Ubuntu 发行版上，执行下列步骤：
 
@@ -31,11 +31,10 @@
 
 	wget -q -O- 'https://download.ceph.com/keys/release.asc' | sudo apt-key add -
 
-#. 添加Ceph软件包源，用Ceph稳定版（如 ``cuttlefish`` 、 \
-   ``dumpling`` 、 ``emperor`` 、 ``firefly`` 等等）替换掉 \
+#. 添加Ceph软件包源，用Ceph稳定版（如 ``hammer`` ， ``jewel`` ，等等）替换掉 \
    ``{ceph-stable-release}`` 。例如： ::
 
-	echo deb http://download.ceph.com/debian-{ceph-stable-release}/ $(lsb_release -sc) main | sudo tee /etc/apt/sources.list.d/ceph.list
+	echo deb https://download.ceph.com/debian-{ceph-stable-release}/ $(lsb_release -sc) main | sudo tee /etc/apt/sources.list.d/ceph.list
 
 #. 更新你的仓库，并安装 ``ceph-deploy`` ： ::
 
@@ -45,17 +44,17 @@
    ``http://ceph.com/`` 替换成 ``http://eu.ceph.com/`` 即可。
 
 
-红帽包管理工具（RPM）
----------------------
+RHEL / CentOS
+-------------
 
-在 Red Hat （rhel6、rhel7）、CentOS （el6、el7）和 Fedora 19-20 （f19 - f20） 上执行下列步骤：
+对于 CentOS 7 ，执行下列步骤：
 
 #. 在 RHEL7 上，用 ``subscription-manager`` 注册你的目标机器，确认你的订阅， \
    并启用安装依赖包的“Extras”软件仓库。例如 ： ::
    
 	sudo subscription-manager repos --enable=rhel-7-server-extras-rpms
    
-#. 在 RHEL6 上，安装并启用 Extra Packages for Enterprise Linux (EPEL) 软件仓库。 \
+#. 安装并启用 Extra Packages for Enterprise Linux (EPEL) 软件仓库。 \
    请查阅 `EPEL wiki`_ 获取更多信息。
    
 #. 在 CentOS 上，可以执行下列命令： ::
@@ -69,15 +68,12 @@
 	sudo vim /etc/yum.repos.d/ceph.repo
 
    把如下内容粘帖进去，用 Ceph 的最新主稳定版名字替换 \
-   ``{ceph-stable-release}`` （如 ``firefly`` ），用你的Linux发行版\
-   名字替换 ``{distro}`` （如 ``el6`` 为 CentOS 6 、 ``el7`` \
-   为 CentOS 7 、 ``rhel6`` 为 Red Hat 6.5 、 ``rhel7`` 为 \
-   Red Hat 7 、 ``fc19`` 是 Fedora 19 、 ``fc20`` 是 Fedora \
-   20 ）。最后保存到 ``/etc/yum.repos.d/ceph.repo`` 文件中。 ::
+   ``{ceph-stable-release}`` （如 ``jewel`` ），用你的Linux发行版\
+   名字替换 ``{distro}`` （如 ``el7`` 为 CentOS 7 ）。最后保存到 ``/etc/yum.repos.d/ceph.repo`` 文件中。 ::
 
 	[ceph-noarch]
 	name=Ceph noarch packages
-	baseurl=http://download.ceph.com/rpm-{ceph-release}/{distro}/noarch
+	baseurl=https://download.ceph.com/rpm-{ceph-release}/{distro}/noarch
 	enabled=1
 	gpgcheck=1
 	type=rpm-md
@@ -93,6 +89,27 @@
    ``http://ceph.com/`` 替换成 ``http://eu.ceph.com/`` 即可。
 
 
+openSUSE
+--------
+
+目前 Ceph 尚未发布针对 openSUSE 的 RPM 包，但是默认的 update 仓\
+库包含了 Ceph 的稳定版，所以安装 Ceph 只需要： ::
+
+	sudo zypper install ceph
+	sudo zypper install ceph-deploy
+	
+如果发行版本号过时了，你可以在 https://bugzilla.opensuse.org/index.cgi \
+上报告一个 bug ，然后试试下面的仓库：
+
+#. Hammer::
+
+        https://software.opensuse.org/download.html?project=filesystems%3Aceph%3Ahammer&package=ceph
+
+#. Jewel::
+
+        https://software.opensuse.org/download.html?project=filesystems%3Aceph%3Ajewel&package=ceph
+
+	
 Ceph 节点安装
 =============
 
